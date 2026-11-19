@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADI PERFORMANCE — Automotive Software & ECU Performance Engineering</title>
+  <meta name="description" content="ADI Performance: Elite ECU Remapping, Dyno Calibration, Big Turbo Builds, and Automotive Software Engineering.">
+  
+  <!-- Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Three.js for 3D Ring Effect -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+  <!-- Top Progress Bar -->
+  <div id="scroll-progress"></div>
+
+  <!-- Master Ambient Background Architecture -->
+  <div class="aurora" aria-hidden="true">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+  </div>
+  <div id="mouse-spotlight" class="mouse-spotlight" aria-hidden="true"></div>
+  <div class="grid-bg" aria-hidden="true"></div>
+
+  <!-- Custom Smooth Cursor -->
+  <div class="custom-cursor" id="cursor">
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+  </div>
+
+  <!-- Floating Navigation Bar -->
+  <header class="nav-wrap">
+    <nav class="nav">
+      <a class="logo" href="#top">
+        <img src="assets/logo.png" alt="ADI Performance Logo" class="logo-img">
+        <div class="logo-text">
+          <b>ADI PERFORMANCE</b>
+          <span class="sub">ECU &amp; DYNO CALIBRATION</span>
+        </div>
+      </a>
+      
+      <div class="nav-links">
+        <a href="#diagnostic" class="scramble-hover">Telemetry</a>
+        <a href="#configurator" class="scramble-hover">Tuning Calculator</a>
+        <a href="#services" class="scramble-hover">Performance Stages</a>
+        <a href="#launchpad" class="scramble-hover">Capabilities</a>
+        <a href="#dyno-records" class="scramble-hover">Dyno Records</a>
+        <a href="#contact" class="scramble-hover">Contact</a>
+      </div>
+
+      <div class="nav-actions">
+        <button class="btn btn-outline terminal-trigger-btn" type="button" title="Open Console (Ctrl+K)">
+          <span>&gt;_ CLI</span>
+          <kbd>Ctrl K</kbd>
+        </button>
+        <a class="btn btn-primary" href="#contact">Book Tune</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <!-- HERO SECTION WITH 3D ORBITING RING -->
+    <section class="hero-section" id="hero">
+      <!-- Exact Fractured Metallic Halo Canvas (from Yusuf Demirkıran) -->
+      <canvas id="globe" class="globe-canvas" aria-hidden="true"></canvas>
+
+      <div class="hero-content">
+        <div class="hero-badge reveal in">
+          <span class="live-dot"></span>
+          <span>HIGH-OCTANE AUTOMOTIVE SOFTWARE &amp; HARDWARE</span>
+        </div>
+        
+        <h1 class="hero-title reveal in scramble-target" data-value="ADI PERFORMANCE">ADI PERFORMANCE</h1>
+        
+        <p class="hero-subtitle reveal in">
+          Precision ECU Remapping <span class="dim">/</span> Custom Dyno Calibration <span class="dim">/</span> Big Turbo Engineering
+        </p>
+
+        <div class="hero-cta-group reveal in">
+          <a class="explore-btn" href="#diagnostic">
+            <i></i><i></i><i></i><i></i>
+            <span>[ Start Telemetry ]</span>
+          </a>
+          <a class="explore-btn btn-secondary-frame" href="#configurator">
+            <i></i><i></i><i></i><i></i>
+            <span>Configure Your Car &rarr;</span>
+          </a>
+        </div>
+
+        <!-- Hero Stats Row -->
+        <div class="hero-telemetry-row reveal in">
+          <div class="stat-pill">
+            <span class="stat-num" data-count="3400">0</span><span class="stat-suffix">+</span>
+            <span class="stat-label">Cars Calibrated</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-pill">
+            <span class="stat-num" data-count="1200">0</span><span class="stat-suffix">HP</span>
+            <span class="stat-label">Max Dyno Build</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-pill">
+            <span class="stat-num" data-count="99">0</span><span class="stat-suffix">.8%</span>
+            <span class="stat-label">Flash Reliability</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-pill">
+            <span class="stat-num" data-count="100">0</span><span class="stat-suffix">%</span>
+            <span class="stat-label">Custom Dyno Mapped</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIVE AUTOMOTIVE DIAGNOSTIC CONSOLE -->
+    <section class="section" id="diagnostic">
+      <div class="section-header">
+        <span class="tag-badge">ECU TELEMETRY ENGINE</span>
+        <h2>Live Diagnostic &amp; <span class="grad-text">Flashing Simulator</span></h2>
+        <p>Interactive automotive CAN-bus terminal communicating with real-time powertrain protocols.</p>
+      </div>
+
+      <div class="terminal-window reveal">
+        <div class="win-header">
+          <div class="win-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <div class="win-title">adi@ecu-core — diagnostic console (v4.2.0-canfd)</div>
+          <div class="win-status"><span class="pulse-indicator"></span> CONNECTED TO BENCH OBD-II</div>
+        </div>
+        
+        <div class="win-body" id="terminal-body">
+          <div class="term-line"><span class="prompt">$</span> <span class="cmd">adi-telemetry --init --vehicle="BMW M3 G80 S58"</span></div>
+          <div class="term-output">
+            <span class="dim">[0.012s]</span> Establishing seed-key exchange via UDS Protocol ISO 14229... <span class="ok">[SUCCESS]</span><br>
+            <span class="dim">[0.045s]</span> Target ECU: <span class="highlight">BOSCH MG1CS024</span> | Flash Checksum: <span class="highlight">VERIFIED</span><br>
+            <span class="dim">[0.088s]</span> Engine Code: <span class="val">S58B30T0 Twin-Turbo 3.0L Inline-6</span><br>
+            <span class="dim">[0.110s]</span> Stock Map: 510 HP / 650 Nm / Boost Peak: 1.7 bar
+          </div>
+
+          <div class="term-line"><span class="prompt">$</span> <span class="cmd">adi-tune --stage="STAGE_2_ADI_PLUS" --fuel="RON98" --anti-lag=ENABLE</span></div>
+          <div class="term-output">
+            <span class="step">&gt; Writing Ignition Advance Tables (+4.2° deg BTDC)...</span> <span class="ok">[DONE]</span><br>
+            <span class="step">&gt; Scaling Rail Pressure &amp; Injector Duty Cycle (+18%)...</span> <span class="ok">[DONE]</span><br>
+            <span class="step">&gt; Calibrating Wastegate Duty Cycle (Peak: 2.35 bar)...</span> <span class="ok">[DONE]</span><br>
+            <span class="step">&gt; Flashing TCU ZF8HP76 Clamping Pressure (+25%)...</span> <span class="ok">[DONE]</span><br>
+            <span class="gr">FLASH COMPLETE: 700 HP / 880 Nm (+190 HP / +230 Nm) — AFR 11.8 TARGET LOCKED</span>
+          </div>
+
+          <div class="term-line active-line">
+            <span class="prompt">$</span> <span id="interactive-cmd-text">adi-telemetry --status</span><span class="cursor-block">█</span>
+          </div>
+        </div>
+
+        <!-- Interactive Quick Action Buttons -->
+        <div class="terminal-quickbar">
+          <span class="qb-label">QUICK TEST:</span>
+          <button class="qb-btn" data-action="stage1">Flash Stage 1 (OEM+)</button>
+          <button class="qb-btn" data-action="stage2">Flash Stage 2 (Sport Cat)</button>
+          <button class="qb-btn" data-action="turbo">Flash ADI Big Turbo</button>
+          <button class="qb-btn" data-action="crackle">Test Pop &amp; Bang Map</button>
+          <button class="qb-btn" data-action="clear">Clear Terminal</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- INTERACTIVE CAR TUNING CALCULATOR / CONFIGURATOR -->
+    <section class="section" id="configurator">
+      <div class="section-header">
+        <span class="tag-badge">PERFORMANCE CALCULATOR</span>
+        <h2>Select Your Car. <span class="grad-text">Calculate Gains.</span></h2>
+        <p>Real dyno-calibrated power curves and torque increases for your exact powertrain.</p>
+      </div>
+
+      <div class="configurator-board reveal">
+        <!-- Step 1: Vehicle & Model Selection -->
+        <div class="cfg-panel vehicle-selector-panel">
+          <div class="panel-tag">01 / SELECT VEHICLE</div>
+          
+          <div class="brand-grid" id="brand-selector">
+            <button class="brand-card active" data-brand="bmw">
+              <span class="brand-logo">BMW</span>
+              <span class="brand-name">M3 / M4 (G80/G82)</span>
+            </button>
+            <button class="brand-card" data-brand="audi">
+              <span class="brand-logo">AUDI</span>
+              <span class="brand-name">RS6 / RS7 (C8 4.0T)</span>
+            </button>
+            <button class="brand-card" data-brand="mercedes">
+              <span class="brand-logo">AMG</span>
+              <span class="brand-name">C63S AMG (W205 V8)</span>
+            </button>
+            <button class="brand-card" data-brand="porsche">
+              <span class="brand-logo">PORSCHE</span>
+              <span class="brand-name">911 Turbo S (992)</span>
+            </button>
+            <button class="brand-card" data-brand="vw">
+              <span class="brand-logo">VW</span>
+              <span class="brand-name">Golf R Mk8 (EA888.4)</span>
+            </button>
+            <button class="brand-card" data-brand="toyota">
+              <span class="brand-logo">TOYOTA</span>
+              <span class="brand-name">GR Supra (B58 3.0T)</span>
+            </button>
+          </div>
+
+          <!-- Stage Selection Tabs -->
+          <div class="panel-tag mt-4">02 / SELECT TUNING STAGE</div>
+          <div class="stage-tabs" id="stage-selector">
+            <button class="stage-tab active" data-stage="1">
+              <div class="stage-title">STAGE 1</div>
+              <div class="stage-desc">Stock Hardware • 100% Software</div>
+            </button>
+            <button class="stage-tab" data-stage="2">
+              <div class="stage-title">STAGE 2</div>
+              <div class="stage-desc">Downpipe + Intercooler + Map</div>
+            </button>
+            <button class="stage-tab" data-stage="3">
+              <div class="stage-title">STAGE 3 (ADI)</div>
+              <div class="stage-desc">Big Turbo + Forged + Meth/E85</div>
+            </button>
+          </div>
+
+          <div class="extra-options">
+            <label class="checkbox-container">
+              <input type="checkbox" id="tcu-option" checked>
+              <span class="checkmark"></span>
+              <span class="opt-text">Add TCU / DSG / ZF Gearbox Remap (Faster shifts &amp; torque limit removal)</span>
+            </label>
+            <label class="checkbox-container">
+              <input type="checkbox" id="pop-option" checked>
+              <span class="checkmark"></span>
+              <span class="opt-text">Add Exhaust Burble / Pop &amp; Bang Calibration (Switchable via Sport Mode)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Step 2: Live Dyno HUD Metrics Display -->
+        <div class="cfg-panel dyno-display-panel">
+          <div class="dyno-header">
+            <div>
+              <span class="dyno-car-name" id="dyno-car-title">BMW M3 G80 Competition (S58)</span>
+              <div class="dyno-ecu-type" id="dyno-ecu-desc">ECU: Bosch MG1CS024 • 3.0L Twin-Turbo</div>
+            </div>
+            <div class="dyno-live-tag">
+              <span class="live-dot green"></span> DYNO BENCH VERIFIED
+            </div>
+          </div>
+
+          <!-- Big Metric Comparison Gauges -->
+          <div class="power-metric-grid">
+            <!-- Horsepower Card -->
+            <div class="power-card">
+              <div class="metric-label">HORSEPOWER (BHP)</div>
+              <div class="metric-comparison">
+                <div class="val-block stock">
+                  <span class="num" id="stock-hp">510</span>
+                  <span class="sub">STOCK</span>
+                </div>
+                <div class="arrow-gain">&rarr;</div>
+                <div class="val-block tuned">
+                  <span class="num grad-text" id="tuned-hp">620</span>
+                  <span class="sub">TUNED</span>
+                </div>
+              </div>
+              <div class="gain-badge" id="hp-gain">+110 HP GAIN</div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="hp-bar" style="width: 78%;"></div>
+              </div>
+            </div>
+
+            <!-- Torque Card -->
+            <div class="power-card">
+              <div class="metric-label">TORQUE (NM)</div>
+              <div class="metric-comparison">
+                <div class="val-block stock">
+                  <span class="num" id="stock-nm">650</span>
+                  <span class="sub">STOCK</span>
+                </div>
+                <div class="arrow-gain">&rarr;</div>
+                <div class="val-block tuned">
+                  <span class="num grad-text" id="tuned-nm">800</span>
+                  <span class="sub">TUNED</span>
+                </div>
+              </div>
+              <div class="gain-badge" id="nm-gain">+150 NM TORQUE</div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="nm-bar" style="width: 82%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Secondary Telemetry Stats -->
+          <div class="secondary-telemetry-row">
+            <div class="sec-stat">
+              <span class="sec-label">0-100 KM/H (0-60 MPH)</span>
+              <span class="sec-val" id="accel-stat">3.9s &rarr; 3.2s (-0.7s)</span>
+            </div>
+            <div class="sec-stat">
+              <span class="sec-label">BOOST PRESSURE</span>
+              <span class="sec-val" id="boost-stat">1.7 bar &rarr; 2.2 bar</span>
+            </div>
+            <div class="sec-stat">
+              <span class="sec-label">SPEED LIMITER</span>
+              <span class="sec-val text-green">250 km/h &rarr; UNLOCKED (330+)</span>
+            </div>
+          </div>
+
+          <!-- Action CTA inside Configurator -->
+          <div class="cfg-action-box">
+            <div class="action-text">
+              <div class="price-est" id="stage-price-est">Stage 1 Package: Software + Dyno Session</div>
+              <div class="sub-guarantee">Includes Before/After Dyno Run Sheet &amp; 30-Day Money-Back Guarantee</div>
+            </div>
+            <a href="#contact" class="btn btn-primary" id="book-cfg-btn">Inquire This Tune &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3D TILT SERVICE STAGES -->
+    <section class="section" id="services">
+      <div class="section-header">
+        <span class="tag-badge">ENGINEERING SPECIALTIES</span>
+        <h2>Precision Tuning. <span class="grad-text">Engineered for Extremes.</span></h2>
+        <p>No generic maps. Every calibration is customized on our AWD braked dyno.</p>
+      </div>
+
+      <div class="services-grid">
+        <!-- Service 1: Stage 1 -->
+        <article class="service-card tilt-card reveal" style="--d: 0">
+          <div class="card-glow"></div>
+          <div class="card-inner">
+            <div class="card-top">
+              <span class="card-number">01</span>
+              <span class="card-tag">SOFTWARE ONLY</span>
+            </div>
+            <div class="card-icon">⚡</div>
+            <h3>Stage 1 ECU Calibration</h3>
+            <p>Refined ignition timing, optimized air-fuel ratio, and controlled boost curves. Safe for everyday street reliability with factory hardware.</p>
+            <ul class="spec-list">
+              <li>✓ +20% to +35% Power Increase</li>
+              <li>✓ Smoother powerband &amp; throttle response</li>
+              <li>✓ Fuel efficiency improved up to 8% at cruising speed</li>
+              <li>✓ Completely reversible to stock anytime</li>
+            </ul>
+            <a href="#contact" class="card-link">Request Stage 1 <span>&rarr;</span></a>
+          </div>
+        </article>
+
+        <!-- Service 2: Stage 2 -->
+        <article class="service-card tilt-card reveal" style="--d: 1">
+          <div class="card-glow"></div>
+          <div class="card-inner">
+            <div class="card-top">
+              <span class="card-number">02</span>
+              <span class="card-tag">HARDWARE + SOFTWARE</span>
+            </div>
+            <div class="card-icon">🔥</div>
+            <h3>Stage 2 Performance</h3>
+            <p>Designed for cars with upgraded high-flow sports catalytic converters, decat downpipes, intercoolers, and cold air induction systems.</p>
+            <ul class="spec-list">
+              <li>✓ +35% to +50% Power Increase</li>
+              <li>✓ Heat soak mitigation &amp; lowered exhaust gas temps</li>
+              <li>✓ Custom pop &amp; bang / overrun exhaust burble</li>
+              <li>✓ Cat-error &amp; OPF/GPF management</li>
+            </ul>
+            <a href="#contact" class="card-link">Request Stage 2 <span>&rarr;</span></a>
+          </div>
+        </article>
+
+        <!-- Service 3: ADI Big Turbo Build -->
+        <article class="service-card tilt-card reveal" style="--d: 2">
+          <div class="card-glow"></div>
+          <div class="card-inner">
+            <div class="card-top">
+              <span class="card-number">03</span>
+              <span class="card-tag">EXTREME BUILDS</span>
+            </div>
+            <div class="card-icon">🏎️</div>
+            <h3>ADI Big Turbo &amp; Forged Builds</h3>
+            <p>Our hallmark service. Full custom hardware fabrication, hybrid turbo integration, forged internal rebuilds, and multi-map race fuels.</p>
+            <ul class="spec-list">
+              <li>✓ +60% to +150%+ Extreme Power Gains</li>
+              <li>✓ Precision custom AWD dyno calibration</li>
+              <li>✓ Ethanol E85 / Water-Methanol injection maps</li>
+              <li>✓ Standalone ECUs (Syvecs, MoTeC, Haltech)</li>
+            </ul>
+            <a href="#contact" class="card-link">Discuss Big Turbo <span>&rarr;</span></a>
+          </div>
+        </article>
+
+        <!-- Service 4: TCU Gearbox & Motorsport Features -->
+        <article class="service-card tilt-card reveal" style="--d: 3">
+          <div class="card-glow"></div>
+          <div class="card-inner">
+            <div class="card-top">
+              <span class="card-number">04</span>
+              <span class="card-tag">TRANSMISSION &amp; EXTRAS</span>
+            </div>
+            <div class="card-icon">⚙️</div>
+            <h3>TCU Transmission &amp; Track Tools</h3>
+            <p>Unlocking dual-clutch and automatic transmissions (DSG, ZF8, PDK) alongside anti-lag, 2-step launch control, and dyno diagnostics.</p>
+            <ul class="spec-list">
+              <li>✓ Up to 40% faster shift execution times</li>
+              <li>✓ Increased clutch clamping pressure prevents slipping</li>
+              <li>✓ Rolling anti-lag, launch control RPM adjustment</li>
+              <li>✓ VMAX top speed limiter deactivation</li>
+            </ul>
+            <a href="#contact" class="card-link">Request TCU Remap <span>&rarr;</span></a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- INTERACTIVE LAUNCHPAD GRID (from the video!) -->
+    <section class="section" id="launchpad">
+      <div class="section-header">
+        <span class="tag-badge">CAPABILITY MATRIX</span>
+        <h2>ADI Automotive Matrix. <span class="grad-text">Hover to explore, click to inspect.</span></h2>
+        <p>36 interactive powertrain protocols, modules, and diagnostic utilities engineered in our workshop.</p>
+      </div>
+
+      <div class="launchpad-container reveal">
+        <div class="launchpad-grid" id="matrix-grid">
+          <!-- 36 pads dynamically populated or styled with glowing badges -->
+        </div>
+
+        <!-- Launchpad Telemetry Detail Viewer -->
+        <div class="launchpad-inspector" id="matrix-inspector">
+          <div class="inspector-badge">INSPECTION ACTIVE</div>
+          <h4 id="insp-title">Bosch MG1 / MD1 ECU Tuning Protocol</h4>
+          <p id="insp-desc">Full bench and OBD-II unlock protocol with anti-tuning bypass for modern BMW, VAG, Porsche, and Mercedes control units.</p>
+          <div class="insp-specs" id="insp-specs">
+            <span>Protocol: CAN-FD / DoIP</span>
+            <span>Security: SHA-256 Seed-Key</span>
+            <span>Status: Verified 100% Stable</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DYNO RECORDS & PROOF -->
+    <section class="section" id="dyno-records">
+      <div class="section-header">
+        <span class="tag-badge">REAL-WORLD EVIDENCE</span>
+        <h2>Recent Dyno Runs &amp; <span class="grad-text">Track Builds</span></h2>
+        <p>Tested on our 2000 HP All-Wheel Drive Linked Braked Dyno cell.</p>
+      </div>
+
+      <div class="dyno-records-grid">
+        <div class="record-card reveal" style="--d: 0">
+          <div class="rec-car">Audi RS6 Avant C8</div>
+          <div class="rec-tune">ADI Stage 2+ • 98 RON</div>
+          <div class="rec-numbers">
+            <span class="stock-n">600 HP / 800 Nm</span>
+            <span class="gain-arrow">&rarr;</span>
+            <span class="tuned-n">820 HP / 1,060 Nm</span>
+          </div>
+          <div class="rec-delta">+220 HP / +260 Nm</div>
+        </div>
+
+        <div class="record-card highlight reveal" style="--d: 1">
+          <div class="rec-car">BMW M3 G80 S58</div>
+          <div class="rec-tune">ADI Stage 3 Hybrid Turbos • E50</div>
+          <div class="rec-numbers">
+            <span class="stock-n">510 HP / 650 Nm</span>
+            <span class="gain-arrow">&rarr;</span>
+            <span class="tuned-n">890 HP / 1,020 Nm</span>
+          </div>
+          <div class="rec-delta">+380 HP / +370 Nm</div>
+        </div>
+
+        <div class="record-card reveal" style="--d: 2">
+          <div class="rec-car">Porsche 911 Turbo S (992)</div>
+          <div class="rec-tune">ADI Stage 1 ECU + TCU Flash</div>
+          <div class="rec-numbers">
+            <span class="stock-n">650 HP / 800 Nm</span>
+            <span class="gain-arrow">&rarr;</span>
+            <span class="tuned-n">760 HP / 940 Nm</span>
+          </div>
+          <div class="rec-delta">+110 HP / +140 Nm</div>
+        </div>
+
+        <div class="record-card reveal" style="--d: 3">
+          <div class="rec-car">VW Golf 8 R 2.0 TSI</div>
+          <div class="rec-tune">Stage 2 + Intake + TCU Clutches</div>
+          <div class="rec-numbers">
+            <span class="stock-n">320 HP / 420 Nm</span>
+            <span class="gain-arrow">&rarr;</span>
+            <span class="tuned-n">440 HP / 560 Nm</span>
+          </div>
+          <div class="rec-delta">+120 HP / +140 Nm</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT & BOOKING SECTION -->
+    <section class="section contact-section" id="contact">
+      <div class="contact-glow"></div>
+      
+      <div class="contact-content reveal">
+        <span class="tag-badge">READY TO UNLEASH PERFORMANCE?</span>
+        <h2>Let's Build Your <span class="grad-text">Custom Tune.</span></h2>
+        <p>Send us your vehicle specifications or book an appointment on our AWD Dyno.</p>
+
+        <!-- Booking & Inquiry Form -->
+        <form class="contact-form" id="tuning-inquiry-form" onsubmit="event.preventDefault(); submitInquiry();">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>YOUR NAME</label>
+              <input type="text" id="cust-name" placeholder="John Doe" required>
+            </div>
+            <div class="form-group">
+              <label>PHONE / WHATSAPP</label>
+              <input type="tel" id="cust-phone" placeholder="+213 770 95 72 27" required>
+            </div>
+            <div class="form-group">
+              <label>CAR MAKE &amp; MODEL</label>
+              <input type="text" id="cust-car" placeholder="e.g. 2023 BMW M3 G80 Competition" required>
+            </div>
+            <div class="form-group">
+              <label>DESIRED SERVICE</label>
+              <select id="cust-service">
+                <option value="stage1">Stage 1 ECU Software Remap</option>
+                <option value="stage2">Stage 2 Hardware + Map Package</option>
+                <option value="stage3">Stage 3 / Big Turbo Build</option>
+                <option value="tcu">TCU Gearbox Remap &amp; Launch Control</option>
+                <option value="dyno">Dyno Power Run &amp; Diagnostic Check</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-group full-width">
+            <label>CURRENT MODIFICATIONS OR SPECIAL REQUESTS</label>
+            <textarea id="cust-notes" rows="3" placeholder="Downpipes, cold air intake, exhaust, pop & bang preference, etc."></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-large">
+              <span>Send Tuning Request</span>
+              <span class="btn-arrow">&rarr;</span>
+            </button>
+            <a href="https://wa.me/213770957227?text=Hi%20ADI%20Performance%2C%20I%20would%20like%20to%20inquire%20about%20a%20tuning%20package" target="_blank" class="btn btn-outline btn-large whatsapp-btn">
+              <span>WhatsApp Direct Chat</span>
+            </a>
+          </div>
+          <div id="form-success-msg" class="success-message"></div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="foot-col brand-col">
+        <a class="logo" href="#top">
+          <img src="assets/logo.png" alt="ADI Performance Logo" class="logo-img">
+          <div class="logo-text">
+            <b>ADI PERFORMANCE</b>
+            <span class="sub">ECU &amp; DYNO CALIBRATION</span>
+          </div>
+        </a>
+        <p>Over 10 years of professional calibration and diagnostics. Delivering custom Stage 1, Stage 2, and Stage 3 firmware, individual file service, and hardware solutions across Algeria and worldwide.</p>
+      </div>
+
+      <div class="foot-col">
+        <b>Navigation</b>
+        <a href="#hero">Overview</a>
+        <a href="#diagnostic">Diagnostic Terminal</a>
+        <a href="#configurator">Tuning Calculator</a>
+        <a href="#services">Performance Stages</a>
+      </div>
+
+      <div class="foot-col">
+        <b>Services &amp; Social</b>
+        <a href="#services">Stage 1 / 2 / 3 Tuning</a>
+        <a href="#services">Tuning File Service</a>
+        <a href="#configurator">Dyno Power Calculator</a>
+        <a href="https://www.facebook.com/adi.perfomance.2025" target="_blank" rel="noopener noreferrer">Facebook Official ↗</a>
+      </div>
+
+      <div class="foot-col">
+        <b>HQ Workshop &amp; Lab</b>
+        <span>📍 Cité Djilali Ahmed, Staoueli, Alger</span>
+        <span>📞 +213 770 95 72 27 / +213 20 32 50 04</span>
+        <span>✉️ Contact@Adi-Performance.com</span>
+        <span>⏱ Mon - Sat: 08:30 - 18:30</span>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>© <span id="year">2026</span> ADI Performance. All Rights Reserved. Master Tuned &amp; Tested.</p>
+    </div>
+  </footer>
+
+  <!-- FLOATING TELEMETRY HUD BAR (Fixed at bottom, exactly as in video!) -->
+  <div class="telemetry-hud-bar">
+    <div class="hud-item"><span class="hud-label">SCROLL</span> <span class="hud-val highlight" id="hud-scroll">0%</span></div>
+    <div class="hud-sep"></div>
+    <div class="hud-item"><span class="hud-label">TELEMETRY</span> <span class="hud-val text-green">ONLINE</span></div>
+    <div class="hud-sep"></div>
+    <div class="hud-item"><span class="hud-label">BENCH</span> <span class="hud-val">AWD DYNO READY</span></div>
+    <div class="hud-sep"></div>
+    <button class="hud-terminal-btn" id="open-terminal-modal">
+      <span class="icon">&gt;_</span> <span class="text">terminal</span> <kbd>Ctrl K</kbd>
+    </button>
+  </div>
+
+  <!-- INTERACTIVE TERMINAL MODAL (Ctrl + K popup!) -->
+  <div class="terminal-modal" id="terminal-modal" aria-hidden="true">
+    <div class="modal-backdrop" id="modal-backdrop"></div>
+    <div class="modal-box">
+      <div class="modal-bar">
+        <div class="win-dots">
+          <span class="dot red" id="close-modal-dot"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+        </div>
+        <div class="modal-title">adi-os // interactive master terminal</div>
+        <button class="modal-close-btn" id="close-modal-btn">&times;</button>
+      </div>
+      
+      <div class="modal-terminal-body" id="modal-terminal-output">
+        <div class="term-greeting">
+          [ ADI_OS AUTOMOTIVE TELEMETRY CLI ]<br>
+          Type <span class="highlight">help</span> for available commands, or try: <span class="val">tune</span>, <span class="val">cars</span>, <span class="val">dyno</span>, <span class="val">contact</span>, <span class="val">clear</span>
+        </div>
+      </div>
+
+      <div class="modal-input-line">
+        <span class="prompt">&gt;</span>
+        <input type="text" id="modal-cmd-input" placeholder="Type a command (e.g. 'help', 'tune stage2', 'dyno')..." autofocus>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="main.js"></script>
+</body>
+</html>
