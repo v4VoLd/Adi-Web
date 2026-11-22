@@ -526,7 +526,7 @@ function initMetalRingGlobe() {
   // Angle calibration: 1.8 = 0 KM/H, -1.0 = 340+ KM/H redline, 1.35 = ~35 KM/H idle
   let startupSweepActive = true;
   let startupStartTime = performance.now();
-  const startupDuration = 1400; // 1.4 seconds smooth sweep
+  const startupDuration = 1800; // Synchronized with deliberate text-forming sweep
 
   let currentNeedleAngle = 1.8; // Starts at 0 KM/H
   let targetNeedleAngle = 1.35; // Settles at idle (~35 KM/H)
@@ -667,6 +667,7 @@ const TELEMETRY_GLYPHS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ<>/{}[];*+=_~^$#@'
 function formWordEffect(element, duration = 1800, delay = 100) {
   if (element._formingWord) return;
   element._formingWord = true;
+  element.style.whiteSpace = 'nowrap';
 
   const targetText = element.getAttribute('data-value') || element.textContent.trim() || 'ADI PERFORMANCE';
   const len = targetText.length;
@@ -693,18 +694,18 @@ function formWordEffect(element, duration = 1800, delay = 100) {
       for (let i = 0; i < len; i++) {
         const char = targetText[i];
         if (char === ' ') {
-          html += '<span style="display:inline-block; width:0.4em;">&nbsp;</span>';
+          html += '<span style="display:inline-block; width:0.45em;">&nbsp;</span>';
         } else if (i < lockedCount) {
-          // Locked character: crisp white
-          html += `<span style="color:#ffffff; text-shadow: 0 0 10px rgba(255,255,255,0.2);">${char}</span>`;
+          // Locked character: crisp white with fixed cell width to prevent any layout shifts
+          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:#ffffff; text-shadow: 0 0 10px rgba(255,255,255,0.2);">${char}</span>`;
         } else if (i === lockedCount) {
-          // Active forming head: flashing Electric Cyan with neon glow
+          // Active forming head: flashing Electric Cyan with neon glow in fixed slot
           const activeGlyph = TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
-          html += `<span style="color:#00F0FF; text-shadow: 0 0 16px #00F0FF, 0 0 30px #00F0FF; font-weight:900;">${activeGlyph}</span>`;
+          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:#00F0FF; text-shadow: 0 0 16px #00F0FF, 0 0 30px #00F0FF; font-weight:900;">${activeGlyph}</span>`;
         } else {
-          // Unformed cipher stream: dim blue-gray matrix characters
+          // Unformed cipher stream: dim matrix glyph in fixed slot
           const cipherGlyph = TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
-          html += `<span style="color:rgba(120, 160, 210, 0.28); font-weight:400;">${cipherGlyph}</span>`;
+          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:rgba(120, 160, 210, 0.28); font-weight:400;">${cipherGlyph}</span>`;
         }
       }
 
@@ -763,13 +764,13 @@ function initScrambleEffects() {
   // Hero title word-forming on page load
   const heroTitle = document.querySelector('.scramble-target');
   if (heroTitle) {
-    // Initiate word forming animation
-    formWordEffect(heroTitle, 1900, 100);
+    // Initiate word forming animation (slower, deliberate pace for cinematic luxury feel)
+    formWordEffect(heroTitle, 2800, 150);
 
     // Hover effect: re-form the word on mouse hover
     heroTitle.style.cursor = 'pointer';
     heroTitle.addEventListener('mouseenter', () => {
-      formWordEffect(heroTitle, 1400, 0);
+      formWordEffect(heroTitle, 2200, 0);
     });
   }
 
