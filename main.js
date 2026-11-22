@@ -689,20 +689,20 @@ function formWordEffect(element, duration = 1800, delay = 100) {
         if (char === ' ') {
           html += '<span class="brand-divider" style="display:inline-block; width:0.45em;">&nbsp;</span>';
         } else if (i < lockedCount) {
-          // Locked characters with clean live motorsport colors
+          // Locked characters: ADI in Speed Yellow, PERFORMANCE generates in pure White
           const colorStyle = isAdi 
             ? 'color:#FFD000; text-shadow:none;' 
-            : 'color:#00F0FF; text-shadow:none;';
+            : 'color:#FFFFFF; text-shadow:none;';
           html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; ${colorStyle}">${char}</span>`;
         } else if (i === lockedCount) {
-          // Active forming head: brilliant flashing specular pulse
+          // Active forming head: brilliant flashing pulse
           const activeGlyph = TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
-          const headColor = isAdi ? '#FFE600' : '#00F0FF';
+          const headColor = isAdi ? '#FFE600' : '#FFFFFF';
           html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:${headColor}; text-shadow:none; font-weight:900;">${activeGlyph}</span>`;
         } else {
           // Unformed cipher stream: clean matrix glyph in fixed slot
           const cipherGlyph = TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
-          const cipherColor = isAdi ? 'rgba(255, 208, 0, 0.4)' : 'rgba(0, 220, 255, 0.4)';
+          const cipherColor = isAdi ? 'rgba(255, 208, 0, 0.4)' : 'rgba(255, 255, 255, 0.45)';
           html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:${cipherColor}; font-weight:400;">${cipherGlyph}</span>`;
         }
       }
@@ -712,8 +712,8 @@ function formWordEffect(element, duration = 1800, delay = 100) {
       if (progress < 1) {
         requestAnimationFrame(updateForming);
       } else {
-        // Final locked-in state: ADI in pure Speed Yellow, PERFORMANCE in pure White - clean crisp typography with no background effect
-        element.innerHTML = '<span class="brand-adi" style="color:#FFD000; text-shadow:none; display:inline-block;">ADI</span><span class="brand-divider" style="display:inline-block; width:0.4em;">&nbsp;</span><span class="brand-perf" style="color:#FFFFFF; text-shadow:none; display:inline-block;">PERFORMANCE</span>';
+        // Final locked-in state: ADI in pure Speed Yellow, PERFORMANCE resolves to Electric Blue
+        element.innerHTML = '<span class="brand-adi" style="color:#FFD000; text-shadow:none; display:inline-block;">ADI</span><span class="brand-divider" style="display:inline-block; width:0.4em;">&nbsp;</span><span class="brand-perf" style="color:#00F0FF; text-shadow:none; display:inline-block;">PERFORMANCE</span>';
         element._formingWord = false;
       }
     }
