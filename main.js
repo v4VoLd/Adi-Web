@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   init3DTilt();
   initLaunchpadMatrix();
   initTerminalModal();
+  initBackToTop();
 });
 
 /* ==========================================================================
@@ -81,431 +82,670 @@ function initScrollHUD() {
 }
 
 /* ==========================================================================
-   3. PROPOSITION 1: THE MGU-K HYBRID STATOR & DYNO ROTOR BLUEPRINT ENGINE
-   24 precision CAD stator coil poles, central dyno rotor hub with cooling ports,
-   concentric degree calibration rings, active magnetic flux lasers & exploded scroll view.
+   3. EXACT FRACTURED METALLIC HALO RING (From Reference Site)
+   70 3D faceted metallic titanium shards, depth-sorted, lighting,
+   streak dashes, floating dust particles & smooth mouse parallax.
    ========================================================================== */
 function initMetalRingGlobe() {
   const canvas = document.getElementById('globe');
-  if (!canvas) return;
+  if (!canvas || typeof THREE === 'undefined') return;
 
-  const ctx = canvas.getContext('2d');
-  let W, H, D;
+  // --------------------------------------------------------------------------
+  // 1. PROCEDURAL 4K MULTI-LAYER TEXTURES FOR 3D EXPLODED CAD DISASSEMBLY
+  // --------------------------------------------------------------------------
+  const size = 2048;
+  const cx = size / 2;
+  const cy = size / 2;
+  const R = size * 0.44;
 
-  function resize() {
-    D = Math.min(window.devicePixelRatio || 1, 2);
-    W = window.innerWidth;
-    H = window.innerHeight;
-    canvas.width = W * D;
-    canvas.height = H * D;
-    ctx.setTransform(D, 0, 0, D, 0, 0);
+  const startAngle = 0.38 * Math.PI; // 0 KM/H (~5:15)
+  const endAngle = 2.22 * Math.PI;   // 340+ KM/H (~3:45)
+  const sweep = endAngle - startAngle;
+  const yellowStart = 1.48 * Math.PI; // 12:00
+  const yellowEnd = endAngle;
+
+  // LAYER 1: Deep Matte Obsidian Base Plate with High-Contrast Typography Vignette
+  function createBaseTexture() {
+    const cv = document.createElement('canvas');
+    cv.width = size; cv.height = size;
+    const ctx = cv.getContext('2d');
+
+    // Enhanced OLED contrast behind headline wordmark
+    const bgGrad = ctx.createRadialGradient(cx, cy, R * 0.05, cx, cy, R * 1.05);
+    bgGrad.addColorStop(0, 'rgba(6, 8, 12, 0.96)');
+    bgGrad.addColorStop(0.35, 'rgba(6, 8, 12, 0.88)');
+    bgGrad.addColorStop(0.65, 'rgba(5, 7, 10, 0.65)');
+    bgGrad.addColorStop(0.88, 'rgba(4, 5, 8, 0.35)');
+    bgGrad.addColorStop(1.0, 'rgba(4, 5, 8, 0)');
+    ctx.fillStyle = bgGrad;
+    ctx.beginPath();
+    ctx.arc(cx, cy, R * 1.05, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Subtle concentric telemetry grid lines
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+    ctx.lineWidth = 2.0;
+    [0.91, 0.76, 0.62, 0.42, 0.26].forEach(rRatio => {
+      ctx.beginPath();
+      ctx.arc(cx, cy, R * rRatio, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+
+    return new THREE.CanvasTexture(cv);
   }
-  resize();
-  window.addEventListener('resize', resize);
 
-  // Random generator with deterministic seed
-  let seed = 42;
-  const rr = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-  const rnd = (a, b) => a + rr() * (b - a);
+  // LAYER 2: Outer Speedometer Scale & Ticks (0 to 340+ KM/H)
+  function createOuterScaleTexture() {
+    const cv = document.createElement('canvas');
+    cv.width = size; cv.height = size;
+    const ctx = cv.getContext('2d');
 
-  // 1. Generate 24 Precision MGU-K Electromagnetic Stator Coil Segments
-  const N = 24;
-  const statorSegments = [];
-  const dTheta = (Math.PI * 2) / N;
-
-  for (let i = 0; i < N; i++) {
-    const th = i * dTheta;
-    const aw_shoe = dTheta * 0.42;    // Inner pole shoe width
-    const aw_waist = dTheta * 0.26;   // Coil winding neck width
-    const aw_yoke = dTheta * 0.46;    // Outer back-iron yoke width
-
-    const ri = 0.58;                  // Inner air-gap radius
-    const rm = 0.75;                  // Mid-pole radius
-    const ro = 0.98;                  // Outer back-iron radius
-
-    // Precision 6-vertex Stator Pole CAD geometry
-    const poly = [
-      [ri, -aw_shoe],
-      [ri, aw_shoe],
-      [rm, aw_waist],
-      [ro, aw_yoke],
-      [ro, -aw_yoke],
-      [rm, -aw_waist]
+    const speedScale = [
+      { speed: 0, a: 0.38 * Math.PI, label: '0' },
+      { speed: 20, a: 0.48 * Math.PI, label: '20' },
+      { speed: 40, a: 0.58 * Math.PI, label: '40' },
+      { speed: 60, a: 0.68 * Math.PI, label: '60' },
+      { speed: 80, a: 0.78 * Math.PI, label: '80' },
+      { speed: 100, a: 0.88 * Math.PI, label: '100' },
+      { speed: 150, a: 1.02 * Math.PI, label: '150' },
+      { speed: 170, a: 1.12 * Math.PI, label: '170' },
+      { speed: 200, a: 1.22 * Math.PI, label: '200' },
+      { speed: 220, a: 1.30 * Math.PI, label: '220' },
+      { speed: 240, a: 1.38 * Math.PI, label: '240' },
+      { speed: 260, a: 1.48 * Math.PI, label: '260' },
+      { speed: 280, a: 1.58 * Math.PI, label: '280' },
+      { speed: 300, a: 1.68 * Math.PI, label: '300' },
+      { speed: 320, a: 1.78 * Math.PI, label: '320' },
+      { speed: 340, a: 1.88 * Math.PI, label: '340+' }
     ];
 
-    // Copper winding insert geometry (wrapped around the tooth neck)
-    const coilPoly = [
-      [rm - 0.04, -aw_waist * 1.15],
-      [rm - 0.04, aw_waist * 1.15],
-      [rm + 0.12, aw_waist * 1.15],
-      [rm + 0.12, -aw_waist * 1.15]
+    const totalTicks = 110;
+    for (let i = 0; i <= totalTicks; i++) {
+      const a = startAngle + (i / totalTicks) * sweep;
+      const isYellow = (a >= yellowStart);
+      const r1 = R * 0.875;
+      const r2 = R * 0.905;
+      ctx.strokeStyle = isYellow ? '#FFC000' : 'rgba(255, 255, 255, 0.45)';
+      ctx.lineWidth = 2.8;
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
+      ctx.lineTo(cx + Math.cos(a) * r2, cy + Math.sin(a) * r2);
+      ctx.stroke();
+    }
+
+    speedScale.forEach(sp => {
+      const isYellow = (sp.a >= yellowStart);
+      const r1 = R * 0.84;
+      const r2 = R * 0.915;
+      ctx.strokeStyle = isYellow ? '#FFC000' : '#FFFFFF';
+      ctx.lineWidth = 5.5;
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(sp.a) * r1, cy + Math.sin(sp.a) * r1);
+      ctx.lineTo(cx + Math.cos(sp.a) * r2, cy + Math.sin(sp.a) * r2);
+      ctx.stroke();
+
+      const tr = R * 0.77;
+      const tx = cx + Math.cos(sp.a) * tr;
+      const ty = cy + Math.sin(sp.a) * tr;
+      ctx.save();
+      ctx.translate(tx, ty);
+      ctx.rotate(sp.a + Math.PI / 2);
+      ctx.font = 'bold 34px "JetBrains Mono", sans-serif';
+      ctx.fillStyle = isYellow ? '#FFE033' : '#FFFFFF';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(sp.label, 0, 0);
+      ctx.restore();
+    });
+
+    return new THREE.CanvasTexture(cv);
+  }
+
+  // LAYER 3: Radiant Speed Yellow Power Band (6000-9000 RPM)
+  function createYellowRedlineTexture() {
+    const cv = document.createElement('canvas');
+    cv.width = size; cv.height = size;
+    const ctx = cv.getContext('2d');
+
+    ctx.save();
+    ctx.shadowColor = '#FFB800';
+    ctx.shadowBlur = 45;
+    ctx.strokeStyle = '#FFC000';
+    ctx.lineWidth = 26;
+    ctx.beginPath();
+    ctx.arc(cx, cy, R * 0.90, yellowStart, yellowEnd);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.save();
+    const yGlow = ctx.createRadialGradient(cx, cy, R * 0.72, cx, cy, R * 0.91);
+    yGlow.addColorStop(0, 'rgba(255, 175, 0, 0.04)');
+    yGlow.addColorStop(0.6, 'rgba(255, 195, 0, 0.20)');
+    yGlow.addColorStop(1, 'rgba(255, 210, 0, 0.42)');
+    ctx.fillStyle = yGlow;
+    ctx.beginPath();
+    ctx.arc(cx, cy, R * 0.905, yellowStart, yellowEnd);
+    ctx.arc(cx, cy, R * 0.72, yellowEnd, yellowStart, true);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    const numLadder = 28;
+    for (let i = 0; i <= numLadder; i++) {
+      const a = yellowStart + (i / numLadder) * (yellowEnd - yellowStart);
+      const r1 = R * 0.73;
+      const r2 = R * 0.89;
+      ctx.strokeStyle = '#FFD500';
+      ctx.lineWidth = (i % 7 === 0) ? 7 : 3.2;
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
+      ctx.lineTo(cx + Math.cos(a) * r2, cy + Math.sin(a) * r2);
+      ctx.stroke();
+    }
+
+    ctx.save();
+    ctx.font = 'bold 38px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#FFE033';
+    ctx.shadowColor = '#FFAA00';
+    ctx.shadowBlur = 12;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const rpms = [
+      { label: '6000', a: 1.58 * Math.PI },
+      { label: '7000', a: 1.76 * Math.PI },
+      { label: '8000', a: 1.94 * Math.PI },
+      { label: '9000', a: 2.12 * Math.PI }
     ];
-
-    statorSegments.push({
-      i,
-      th,
-      poly,
-      coilPoly,
-      isGoldCoil: (i % 2 === 0), // Speed Yellow copper coil accents
-      thick: 0.042,
-      tilt: 0,
-      tone: (i % 3) / 3,
-      ph: (i / N) * Math.PI * 2
+    rpms.forEach(rpm => {
+      const tr = R * 0.65;
+      const tx = cx + Math.cos(rpm.a) * tr;
+      const ty = cy + Math.sin(rpm.a) * tr;
+      ctx.save();
+      ctx.translate(tx, ty);
+      ctx.rotate(rpm.a + Math.PI / 2);
+      ctx.fillText(rpm.label, 0, 0);
+      ctx.restore();
     });
+    ctx.restore();
+
+    return new THREE.CanvasTexture(cv);
   }
 
-  // 2. Generate Central Rotor Core with 8 Axial Ventilation Ports
-  const rotorPorts = [];
-  const numPorts = 8;
-  for (let p = 0; p < numPorts; p++) {
-    const ang = (p / numPorts) * Math.PI * 2;
-    rotorPorts.push({
-      ang,
-      r: 0.32,
-      size: 0.045
-    });
+  // LAYER 4: Inner Cyan Concentric Arc & Engineering Telemetry (NO Duplicate ADI Text)
+  function createInnerTelemetryTexture() {
+    const cv = document.createElement('canvas');
+    cv.width = size; cv.height = size;
+    const ctx = cv.getContext('2d');
+
+    // Inner glowing cyan arc
+    ctx.save();
+    ctx.shadowColor = '#00F0FF';
+    ctx.shadowBlur = 32;
+    ctx.strokeStyle = '#00E5FF';
+    ctx.lineWidth = 11;
+    ctx.beginPath();
+    ctx.arc(cx, cy, R * 0.52, 0.65 * Math.PI, 2.15 * Math.PI);
+    ctx.stroke();
+    ctx.restore();
+
+    // Secondary concentric telemetry ring
+    ctx.save();
+    ctx.strokeStyle = 'rgba(0, 229, 255, 0.25)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(cx, cy, R * 0.40, 0, 2 * Math.PI);
+    ctx.stroke();
+
+    // Subtle radial tick marks along inner ring
+    const innerTicks = 36;
+    for (let i = 0; i < innerTicks; i++) {
+      const a = (i / innerTicks) * 2 * Math.PI;
+      const isMajor = (i % 6 === 0);
+      const r1 = R * (isMajor ? 0.37 : 0.39);
+      const r2 = R * 0.41;
+      ctx.strokeStyle = isMajor ? 'rgba(0, 240, 255, 0.65)' : 'rgba(0, 240, 255, 0.20)';
+      ctx.lineWidth = isMajor ? 2.0 : 1.0;
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
+      ctx.lineTo(cx + Math.cos(a) * r2, cy + Math.sin(a) * r2);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    return new THREE.CanvasTexture(cv);
   }
 
-  // 3. High-Speed Magnetic Flux Laser Streaks (Yellow & Electric Cyan)
-  const fluxStreaks = Array.from({ length: 6 }, (_, idx) => ({
-    r: 0.56 + (idx % 3) * 0.28,
-    speed: 0.06 + (idx % 2) * 0.04,
-    len: 0.35 + (idx % 2) * 0.25,
-    p: (idx / 6) * Math.PI * 2,
-    color: idx % 2 === 0 ? 'rgba(255, 208, 0, 0.95)' : 'rgba(0, 220, 255, 0.95)'
-  }));
+  // --------------------------------------------------------------------------
+  // 2. THREE.JS SCENE SETUP (Alpha Transparent)
+  // --------------------------------------------------------------------------
+  const scene = new THREE.Scene();
+  scene.background = null;
 
-  // 4. Ambient Titanium / Dyno Embers
-  const dust = Array.from({ length: 70 }, () => ({
-    x: rnd(-1.3, 1.3),
-    y: rnd(-1.3, 1.3),
-    z: rnd(-0.8, 0.8),
-    v: rnd(0.04, 0.22)
-  }));
+  const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.set(0, 0, 8.2);
 
-  let assemble = 1;
-  let rot = 0;
-  let tx = 0;
-  let ty = 0;
-  let mx = 0;
-  let my = 0;
-  let boost = 0;
-  let ex = 0;
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.25;
+
+  // Studio Lighting
+  const ambientLight = new THREE.AmbientLight(0x182030, 1.8);
+  scene.add(ambientLight);
+
+  const keyLight = new THREE.DirectionalLight(0xffffff, 3.2);
+  keyLight.position.set(-4.5, 5.5, 4.5);
+  scene.add(keyLight);
+
+  const fillLight = new THREE.DirectionalLight(0x5a7090, 1.2);
+  fillLight.position.set(4.0, 3.5, 3.0);
+  scene.add(fillLight);
+
+  const yellowSpot = new THREE.SpotLight(0xffb800, 5.0, 7.0, Math.PI / 4, 0.45, 1.0);
+  yellowSpot.position.set(2.4, 2.6, 2.8);
+  scene.add(yellowSpot);
+
+  // --------------------------------------------------------------------------
+  // 3. EXPLODABLE 3D GAUGE ASSEMBLY (SEPARATED LAYERS)
+  // --------------------------------------------------------------------------
+  const baseGaugeY = -0.09;
+  const gaugeGroup = new THREE.Group();
+  gaugeGroup.rotation.x = 0.44;
+  gaugeGroup.rotation.y = -0.10;
+  gaugeGroup.position.set(0, baseGaugeY, 0);
+  scene.add(gaugeGroup);
+
+  // Full commanding heroic dial scale - fills the cockpit height symmetrically
+  const dialRadius = 2.30;
+
+  // LAYER 1: Base Plate Mesh
+  const baseTex = createBaseTexture();
+  baseTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  const baseMat = new THREE.MeshStandardMaterial({
+    map: baseTex,
+    transparent: true,
+    opacity: 0.95,
+    roughness: 0.70,
+    metalness: 0.10,
+    depthWrite: false
+  });
+  const baseMesh = new THREE.Mesh(new THREE.CircleGeometry(dialRadius, 64), baseMat);
+  baseMesh.position.z = 0;
+  gaugeGroup.add(baseMesh);
+
+  // LAYER 2: Outer Scale Mesh (0 to 340+ KM/H)
+  const outerTex = createOuterScaleTexture();
+  outerTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  const outerMat = new THREE.MeshStandardMaterial({
+    map: outerTex,
+    transparent: true,
+    opacity: 0.95,
+    roughness: 0.50,
+    metalness: 0.20,
+    depthWrite: false
+  });
+  const outerMesh = new THREE.Mesh(new THREE.CircleGeometry(dialRadius, 64), outerMat);
+  outerMesh.position.z = 0.01;
+  gaugeGroup.add(outerMesh);
+
+  // LAYER 3: Speed Yellow Redline Mesh (6000-9000 RPM)
+  const yellowTex = createYellowRedlineTexture();
+  yellowTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  const yellowMat = new THREE.MeshStandardMaterial({
+    map: yellowTex,
+    transparent: true,
+    opacity: 0.95,
+    roughness: 0.35,
+    metalness: 0.30,
+    depthWrite: false
+  });
+  const yellowMesh = new THREE.Mesh(new THREE.CircleGeometry(dialRadius, 64), yellowMat);
+  yellowMesh.position.z = 0.02;
+  gaugeGroup.add(yellowMesh);
+
+  // LAYER 4: Inner Cyan Telemetry Halo Mesh
+  const innerTex = createInnerTelemetryTexture();
+  innerTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  const innerMat = new THREE.MeshStandardMaterial({
+    map: innerTex,
+    transparent: true,
+    opacity: 0.95,
+    roughness: 0.40,
+    metalness: 0.25,
+    depthWrite: false
+  });
+  const innerMesh = new THREE.Mesh(new THREE.CircleGeometry(dialRadius, 64), innerMat);
+  innerMesh.position.z = 0.03;
+  gaugeGroup.add(innerMesh);
+
+  // LAYER 5: Sweeping 3D Needle & Machined Billet Hub
+  const needlePivot = new THREE.Group();
+  needlePivot.position.set(0, 0, 0.08);
+  gaugeGroup.add(needlePivot);
+
+  const hubMat = new THREE.MeshStandardMaterial({
+    color: 0x3e4758,
+    roughness: 0.25,
+    metalness: 0.95
+  });
+  const hubGeo = new THREE.CylinderGeometry(0.24, 0.28, 0.12, 32);
+  hubGeo.rotateX(Math.PI / 2);
+  const hubMesh = new THREE.Mesh(hubGeo, hubMat);
+  hubMesh.position.z = 0.06;
+  needlePivot.add(hubMesh);
+
+  const hubRingGeo = new THREE.RingGeometry(0.09, 0.14, 32);
+  const hubRingMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff });
+  const hubRing = new THREE.Mesh(hubRingGeo, hubRingMat);
+  hubRing.position.z = 0.125;
+  needlePivot.add(hubRing);
+
+  // Progressive color palette for small center circle (Cyan -> Yellow -> Red)
+  const hubColorCyan = new THREE.Color(0x00f0ff);
+  const hubColorYellow = new THREE.Color(0xffd000);
+  const hubColorRed = new THREE.Color(0xff2a1a);
+
+  // 3D Neon Cyan Needle Blade (Full size sweeping tachometer pointer)
+  const needleShape = new THREE.Shape();
+  needleShape.moveTo(-0.040, -0.25);
+  needleShape.lineTo(0.040, -0.25);
+  needleShape.lineTo(0.034, 1.50);
+  needleShape.lineTo(0.0, 1.68);
+  needleShape.lineTo(-0.034, 1.50);
+  needleShape.closePath();
+
+  const extrudeSettings = { depth: 0.035, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.015, bevelThickness: 0.015 };
+  const needleGeo = new THREE.ExtrudeGeometry(needleShape, extrudeSettings);
+  const needleMat = new THREE.MeshStandardMaterial({
+    color: 0x00d4ff,
+    emissive: 0x00f0ff,
+    emissiveIntensity: 1.4,
+    roughness: 0.18,
+    metalness: 0.25
+  });
+  const needleMesh = new THREE.Mesh(needleGeo, needleMat);
+  needleMesh.position.z = 0.12;
+  needlePivot.add(needleMesh);
+
+  // White-Hot High-Contrast Core Optical Spine on Needle
+  const spineGeo = new THREE.BoxGeometry(0.016, 1.58, 0.048);
+  const spineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+  const spineMesh = new THREE.Mesh(spineGeo, spineMat);
+  spineMesh.position.set(0, 0.72, 0.15);
+  needlePivot.add(spineMesh);
+
+  // Dynamic Neon Point Light mounted on the needle
+  const needleGlowLight = new THREE.PointLight(0x00f0ff, 2.8, 2.8);
+  needleGlowLight.position.set(0, 0.9, 0.22);
+  needlePivot.add(needleGlowLight);
+
+  // Blueprint Disassembly Laser Guide Rays
+  const guidesGroup = new THREE.Group();
+  const guideMat = new THREE.LineDashedMaterial({
+    color: 0x00e5ff,
+    dashSize: 0.08,
+    gapSize: 0.06,
+    transparent: true,
+    opacity: 0.0
+  });
+
+  const guidePoints = [
+    [-1.2, 1.2],
+    [1.4, 1.4],
+    [1.5, -0.8],
+    [-1.4, -1.0]
+  ];
+
+  guidePoints.forEach(([gx, gy]) => {
+    const geo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(gx, gy, -1.0),
+      new THREE.Vector3(gx, gy, 1.5)
+    ]);
+    const line = new THREE.Line(geo, guideMat);
+    line.computeLineDistances();
+    guidesGroup.add(line);
+  });
+  gaugeGroup.add(guidesGroup);
+
+  // --------------------------------------------------------------------------
+  // 4. IGNITION STARTUP NEEDLE SWEEP CEREMONY & INTERACTION PHYSICS
+  // --------------------------------------------------------------------------
+  let mouseX = 0;
+  let mouseY = 0;
+  let targetRotX = 0.44;
+  let targetRotY = -0.10;
+
+  // Ignition Needle Sweep State
+  // Angle calibration: 1.70 = 0 KM/H idle (bottom-left), -1.00 = 340+ KM/H redline (top-right yellow arc)
+  const NEEDLE_IDLE = 1.70;
+  const NEEDLE_REDLINE = -1.00;
+  const NEEDLE_SPAN = NEEDLE_IDLE - NEEDLE_REDLINE; // 2.70 rad full sweep
+
+  let startupSweepActive = true;
+  let startupStartTime = performance.now();
+  const startupDuration = 1800; // Synchronized with deliberate text-forming sweep
+
+  let currentNeedleAngle = NEEDLE_IDLE; // Starts at 0 KM/H
+  let targetNeedleAngle = NEEDLE_IDLE; // Settles at 0 KM/H bench ready
   let scrollVel = 0;
   let lastY = window.scrollY;
+
+  window.addEventListener('mousemove', (e) => {
+    const nx = (e.clientX / window.innerWidth) - 0.5;
+    const ny = (e.clientY / window.innerHeight) - 0.5;
+    mouseX = nx;
+    mouseY = ny;
+
+    targetRotX = 0.44 + ny * 0.25;
+    targetRotY = -0.10 + nx * 0.32;
+
+    // Full interactive engine rev: moving mouse left-to-right revs the needle across the entire dial!
+    startupSweepActive = false; // Mouse motion takes immediate throttle control
+    const speedFrac = Math.max(0, Math.min(1, e.clientX / window.innerWidth));
+    targetNeedleAngle = NEEDLE_IDLE - speedFrac * NEEDLE_SPAN;
+  }, { passive: true });
 
   window.addEventListener('scroll', () => {
     scrollVel = window.scrollY - lastY;
     lastY = window.scrollY;
   }, { passive: true });
 
-  window.addEventListener('pointermove', (e) => {
-    mx = e.clientX / W - 0.5;
-    my = e.clientY / H - 0.5;
-  }, { passive: true });
+  function onResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+  window.addEventListener('resize', onResize);
 
-  const ease = (t) => 1 - Math.pow(1 - t, 4);
+  const clock = new THREE.Clock();
 
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
+  function animate() {
+    requestAnimationFrame(animate);
+    const elapsedTime = clock.getElapsedTime();
+    const now = performance.now();
 
-    ex += (Math.min(1, window.scrollY / (H * 0.8)) - ex) * 0.1;
-    const fade = Math.max(0, 1 - Math.pow(ex, 1.6));
+    // ------------------------------------------------------------------------
+    // A. Startup Needle Sweep Ceremony (Porsche / GT3 Ignition Check)
+    // ------------------------------------------------------------------------
+    if (startupSweepActive) {
+      const elapsed = now - startupStartTime;
+      const t = Math.min(1, elapsed / startupDuration);
 
-    if (fade <= 0.01) {
-      requestAnimationFrame(draw);
+      if (t < 0.55) {
+        // Phase 1: Rapid rev from 0 to redline
+        const p1 = t / 0.55;
+        const easeRev = 1 - Math.pow(1 - p1, 3);
+        currentNeedleAngle = NEEDLE_IDLE - easeRev * NEEDLE_SPAN;
+      } else if (t < 1.0) {
+        // Phase 2: Smooth settling return to 0 KM/H bench ready
+        const p2 = (t - 0.55) / 0.45;
+        const easeReturn = 1 - Math.pow(1 - p2, 2);
+        currentNeedleAngle = NEEDLE_REDLINE + easeReturn * NEEDLE_SPAN;
+      } else {
+        startupSweepActive = false;
+        targetNeedleAngle = NEEDLE_IDLE;
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // B. Clean Parallax Fade Dynamics (Cohesive Instrument, Zero Debris)
+    // ------------------------------------------------------------------------
+    const scrollDistance = window.scrollY;
+    // Fast, elegant fade: dissolves cleanly within the first 260px of scroll
+    const fadeProgress = Math.min(1.0, scrollDistance / 260);
+    const fade = Math.max(0, 1 - Math.pow(fadeProgress, 1.4));
+
+    if (fade <= 0.001) {
+      renderer.clear();
       return;
     }
 
-    boost += (Math.abs(scrollVel) * 0.002 - boost) * 0.08;
-    scrollVel *= 0.9;
+    // Parallax Interpolation (Naturally ascends with hero content)
+    gaugeGroup.rotation.x += (targetRotX - gaugeGroup.rotation.x) * 0.05;
+    gaugeGroup.rotation.y += (targetRotY - gaugeGroup.rotation.y) * 0.05;
+    gaugeGroup.position.y = baseGaugeY - scrollDistance * 0.0032;
+    
+    // Subtle cohesive scale recession on scroll
+    const scaleFactor = 1 - fadeProgress * 0.06;
+    gaugeGroup.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-    const now = performance.now() / 1000;
-    rot += 0.0018 + boost;
-    tx += (mx * 0.45 - tx) * 0.04;
-    ty += (my * 0.35 - ty) * 0.04;
+    // Keep all instrument layers calibrated and unified (no exploded fragments)
+    needlePivot.position.set(0, 0, 0.08);
+    needlePivot.rotation.x = 0;
+    innerMesh.position.set(0, 0, 0.03);
+    innerMesh.scale.set(1, 1, 1);
+    yellowMesh.position.set(0, 0, 0.02);
+    outerMesh.position.set(0, 0, 0.01);
+    outerMesh.scale.set(1, 1, 1);
+    baseMesh.position.set(0, 0, 0);
+    guideMat.opacity = 0;
 
-    const R = Math.min(W, H) * (W < 700 ? 0.38 : 0.36);
-    const cx = W / 2;
-    const cy = H * 0.5 - window.scrollY * 0.12;
-    const as = ease(assemble);
-    const k = 1 - as;
+    // Smooth Opacity Fade across all layers
+    baseMat.opacity = 0.95 * fade;
+    outerMat.opacity = 0.95 * fade;
+    yellowMat.opacity = 0.95 * fade;
+    innerMat.opacity = 0.95 * fade;
+    needleMat.opacity = fade;
+    needleMat.transparent = true;
 
-    const A = Math.sin(rot * 0.7) * 0.32 + tx;
-    const B = 0.24 + Math.sin(rot * 0.45) * 0.1 + ty;
-    const ca = Math.cos(A), sa = Math.sin(A);
-    const cb = Math.cos(B), sb = Math.sin(B);
+    // ------------------------------------------------------------------------
+    // C. Dynamic Engine Rev & Idle Rumble Physics
+    // ------------------------------------------------------------------------
+    if (!startupSweepActive) {
+      const scrollSurge = Math.min(2.0, Math.abs(scrollVel) * 0.08 + fadeProgress * 1.6);
+      scrollVel *= 0.92;
 
-    // 3D Perspective Projection Matrix
-    const proj = (x, y, z) => {
-      const x1 = x * ca + z * sa;
-      const z1 = -x * sa + z * ca;
-      const y1 = y * cb - z1 * sb;
-      const z2 = y * sb + z1 * cb;
-      const s = 1 / (2.6 - z2 * 0.6);
-      return [cx + x1 * R * s * 2.3, cy + y1 * R * s * 2.3, z2, s];
-    };
-
-    // Inner subtle dark vignette disk behind text for 100% typography clarity
-    const rg = ctx.createRadialGradient(cx, cy, R * 0.2, cx, cy, R * 1.15);
-    rg.addColorStop(0, 'rgba(8, 10, 15, 0.85)');
-    rg.addColorStop(0.65, 'rgba(8, 10, 15, 0.65)');
-    rg.addColorStop(1, 'rgba(8, 10, 15, 0)');
-    ctx.globalAlpha = fade * as;
-    ctx.fillStyle = rg;
-    ctx.beginPath();
-    ctx.arc(cx, cy, R * 1.15, 0, Math.PI * 2);
-    ctx.fill();
-
-    // --------------------------------------------------------------------------
-    // A. CAD Telemetry Concentric Blueprint Rings & Degree Markers
-    // --------------------------------------------------------------------------
-    const drawCadRing = (radiusVal, strokeStyle, dashArray = [], lineWidth = 1) => {
-      ctx.save();
-      ctx.strokeStyle = strokeStyle;
-      ctx.lineWidth = lineWidth;
-      ctx.setLineDash(dashArray);
-      ctx.beginPath();
-      const steps = 64;
-      for (let s = 0; s <= steps; s++) {
-        const a = (s / steps) * Math.PI * 2 + rot * 0.05;
-        const px = Math.cos(a) * radiusVal;
-        const py = Math.sin(a) * radiusVal;
-        const P = proj(px, py, 0);
-        if (s === 0) ctx.moveTo(P[0], P[1]);
-        else ctx.lineTo(P[0], P[1]);
-      }
-      ctx.stroke();
-      ctx.restore();
-    };
-
-    // Outer Blueprint Rings
-    ctx.globalAlpha = fade * as * 0.45;
-    drawCadRing(1.15, 'rgba(0, 163, 224, 0.55)', [6, 8], 1.2);
-    drawCadRing(1.05, 'rgba(255, 208, 0, 0.6)', [12, 10], 1.0);
-    drawCadRing(0.52, 'rgba(0, 220, 255, 0.45)', [4, 6], 0.8);
-
-    // Radial Degree Ticks (72 calibration ticks every 5 degrees)
-    ctx.lineWidth = 1;
-    for (let deg = 0; deg < 360; deg += 10) {
-      const a = (deg * Math.PI) / 180 + rot * 0.05;
-      const isMajor = (deg % 90 === 0);
-      const isSemiMajor = (deg % 30 === 0);
-      const len = isMajor ? 0.08 : (isSemiMajor ? 0.05 : 0.025);
-      const r1 = 1.05;
-      const r2 = r1 + len;
-
-      const P1 = proj(Math.cos(a) * r1, Math.sin(a) * r1, 0);
-      const P2 = proj(Math.cos(a) * r2, Math.sin(a) * r2, 0);
-
-      ctx.strokeStyle = isMajor ? 'rgba(255, 208, 0, 0.95)' : (isSemiMajor ? 'rgba(0, 220, 255, 0.7)' : 'rgba(200, 214, 235, 0.3)');
-      ctx.beginPath();
-      ctx.moveTo(P1[0], P1[1]);
-      ctx.lineTo(P2[0], P2[1]);
-      ctx.stroke();
-
-      // Major degree text labels in 3D
-      if (isMajor) {
-        const textPos = proj(Math.cos(a) * (r2 + 0.06), Math.sin(a) * (r2 + 0.06), 0);
-        ctx.fillStyle = '#FFD000';
-        ctx.font = '10px "JetBrains Mono", monospace';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(`${deg}°`, textPos[0], textPos[1]);
-      }
+      const idlePulse = Math.sin(elapsedTime * 4.5) * 0.025 + Math.sin(elapsedTime * 9.2) * 0.012;
+      currentNeedleAngle += (targetNeedleAngle - scrollSurge + idlePulse - currentNeedleAngle) * 0.08;
     }
 
-    // --------------------------------------------------------------------------
-    // B. Exploded Stator Pole Segments (24 CAD Electromagnetic Units)
-    // --------------------------------------------------------------------------
-    const list = [];
-    const lx = Math.cos(now * 0.25);
-    const ly = -0.6;
+    needlePivot.rotation.z = currentNeedleAngle;
 
-    for (const s of statorSegments) {
-      const ang = s.th + rot * 0.12;
-
-      // Dynamic Exploded Blueprint Dispersal on Scroll:
-      // Radial explosion outward + Z-axis layer separation!
-      const radialExplode = (ex * 1.6 + k * 1.8);
-      const ox = Math.cos(ang) * radialExplode;
-      const oy = Math.sin(ang) * radialExplode;
-      const oz = (s.isGoldCoil ? 0.12 : -0.12) * ex * 1.4;
-
-      // Project Stator Tooth Polygons
-      const pts = s.poly.map(([r, da]) => {
-        const x = Math.cos(ang + da) * r;
-        const y = Math.sin(ang + da) * r;
-        return proj(x + ox, y + oy, oz);
-      });
-
-      // Project Copper Coil Inserts
-      const coilPts = s.coilPoly.map(([r, da]) => {
-        const x = Math.cos(ang + da) * r;
-        const y = Math.sin(ang + da) * r;
-        return proj(x + ox, y + oy, oz + 0.015);
-      });
-
-      list.push({
-        pts,
-        coilPts,
-        z: pts.reduce((acc, p) => acc + p[2], 0) / pts.length,
-        s,
-        ang
-      });
+    // Progressive color transition on the small center circle:
+    // Tracks current rev: Cyan (0 KM/H) -> Speed Yellow (Mid RPM) -> Redline Red (Full Rev)
+    const revFrac = Math.max(0, Math.min(1, (NEEDLE_IDLE - currentNeedleAngle) / NEEDLE_SPAN));
+    if (revFrac < 0.50) {
+      const t = revFrac / 0.50;
+      hubRingMat.color.copy(hubColorCyan).lerp(hubColorYellow, t);
+    } else {
+      const t = (revFrac - 0.50) / 0.50;
+      hubRingMat.color.copy(hubColorYellow).lerp(hubColorRed, t);
     }
 
-    // Depth-sort all 3D mechanical elements
-    list.sort((a, b) => a.z - b.z);
-
-    for (const o of list) {
-      const { pts, coilPts, s } = o;
-      const a = fade * (0.2 + 0.8 * as);
-      const th = s.thick * R * 1.8;
-
-      // 1. Extruded Mechanical Depth (Dark Titanium Underside)
-      ctx.globalAlpha = a;
-      ctx.fillStyle = '#0c0f14';
-      ctx.beginPath();
-      pts.forEach((p, idx) => (idx ? ctx.lineTo(p[0], p[1] + th * p[3] * 2) : ctx.moveTo(p[0], p[1] + th * p[3] * 2)));
-      ctx.closePath();
-      ctx.fill();
-
-      // 2. Faceted Stator Tooth Shading (Titanium / Tool Steel Finish)
-      for (let i = 1; i < pts.length - 1; i++) {
-        const A0 = pts[0], B0 = pts[i], C0 = pts[i + 1];
-        const nx = Math.sin(s.ph + i * 1.8 + now * 0.35);
-        const f = 0.5 + 0.5 * (nx * lx + ly * 0.2);
-        const v = Math.max(0, Math.min(1, 0.2 + f * 0.5 * (0.6 + s.tone * 0.5) + ((o.z + 1) / 2) * 0.2));
-
-        // Precision Titanium Color
-        ctx.fillStyle = `rgb(${26 + v * 82 | 0}, ${32 + v * 88 | 0}, ${42 + v * 98 | 0})`;
-        ctx.beginPath();
-        ctx.moveTo(A0[0], A0[1]);
-        ctx.lineTo(B0[0], B0[1]);
-        ctx.lineTo(C0[0], C0[1]);
-        ctx.closePath();
-        ctx.fill();
-      }
-
-      // 3. Stator Specular Edge Gleams (Electric Cyan outline)
-      ctx.strokeStyle = `rgba(0, 163, 224, ${0.15 + 0.35 * ((o.z + 1) / 2)})`;
-      ctx.lineWidth = 0.9;
-      ctx.beginPath();
-      pts.forEach((p, idx) => (idx ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])));
-      ctx.closePath();
-      ctx.stroke();
-
-      // 4. Speed Yellow Copper Coil Winding Core Insert
-      if (s.isGoldCoil) {
-        ctx.fillStyle = 'rgba(255, 208, 0, 0.85)';
-        ctx.beginPath();
-        coilPts.forEach((cp, cidx) => (cidx ? ctx.lineTo(cp[0], cp[1]) : ctx.moveTo(cp[0], cp[1])));
-        ctx.closePath();
-        ctx.fill();
-
-        // High-contrast gold gleam
-        ctx.strokeStyle = '#FFE066';
-        ctx.lineWidth = 1.2;
-        ctx.stroke();
-      }
-    }
-
-    // --------------------------------------------------------------------------
-    // C. Central Dyno Rotor Core & Hub (Lifts Forward in Z on Scroll)
-    // --------------------------------------------------------------------------
-    const rotorZ = 0.15 + ex * 0.9;
-    const P_center = proj(0, 0, rotorZ);
-
-    // Rotor Core Base Disk
-    ctx.save();
-    ctx.globalAlpha = fade * as * 0.9;
-    ctx.fillStyle = '#10141b';
-    ctx.strokeStyle = 'rgba(255, 208, 0, 0.8)';
-    ctx.lineWidth = 1.4;
-    ctx.beginPath();
-    for (let i = 0; i <= 32; i++) {
-      const a = (i / 32) * Math.PI * 2 + rot * 0.12;
-      const P = proj(Math.cos(a) * 0.42, Math.sin(a) * 0.42, rotorZ);
-      if (i === 0) ctx.moveTo(P[0], P[1]);
-      else ctx.lineTo(P[0], P[1]);
-    }
-    ctx.fill();
-    ctx.stroke();
-
-    // 8 Axial Cooling Ports
-    rotorPorts.forEach((port) => {
-      const pAngle = port.ang + rot * 0.12;
-      const px = Math.cos(pAngle) * port.r;
-      const py = Math.sin(pAngle) * port.r;
-      const P = proj(px, py, rotorZ + 0.01);
-      ctx.fillStyle = 'rgba(0, 163, 224, 0.65)';
-      ctx.beginPath();
-      ctx.arc(P[0], P[1], port.size * R * P[3], 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    // Central Drive Spline Hub
-    ctx.strokeStyle = '#00F0FF';
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    for (let i = 0; i <= 16; i++) {
-      const a = (i / 16) * Math.PI * 2 + rot * 0.12;
-      const rSpline = (i % 2 === 0) ? 0.18 : 0.14;
-      const P = proj(Math.cos(a) * rSpline, Math.sin(a) * rSpline, rotorZ + 0.02);
-      if (i === 0) ctx.moveTo(P[0], P[1]);
-      else ctx.lineTo(P[0], P[1]);
-    }
-    ctx.stroke();
-    ctx.restore();
-
-    // --------------------------------------------------------------------------
-    // D. Active Magnetic Flux Laser Streaks (Yellow & Electric Cyan)
-    // --------------------------------------------------------------------------
-    ctx.lineWidth = 1.2;
-    for (const strk of fluxStreaks) {
-      strk.p = (strk.p + strk.speed * (0.016 + boost * 5)) % (Math.PI * 2);
-      const aStart = strk.p + rot * 0.12;
-      const aEnd = aStart + strk.len;
-
-      ctx.strokeStyle = strk.color;
-      ctx.globalAlpha = 0.9 * fade * as;
-      ctx.setLineDash([8, 6]);
-      ctx.beginPath();
-      const streakSteps = 16;
-      for (let st = 0; st <= streakSteps; st++) {
-        const a = aStart + (st / streakSteps) * strk.len;
-        const P = proj(Math.cos(a) * strk.r, Math.sin(a) * strk.r, 0.02);
-        if (st === 0) ctx.moveTo(P[0], P[1]);
-        else ctx.lineTo(P[0], P[1]);
-      }
-      ctx.stroke();
-      ctx.setLineDash([]);
-    }
-
-    // --------------------------------------------------------------------------
-    // E. Floating Titanium & Dyno Dust Embers
-    // --------------------------------------------------------------------------
-    ctx.fillStyle = '#dfe7f5';
-    for (const d of dust) {
-      d.y -= d.v * 0.0016;
-      if (d.y < -1.3) d.y = 1.3;
-      const P = proj(d.x, d.y, d.z * 0.6);
-      ctx.globalAlpha = (0.12 + (P[2] + 1) * 0.25) * fade * as;
-      ctx.fillRect(P[0], P[1], 1.4, 1.4);
-    }
-
-    ctx.globalAlpha = 1;
-    requestAnimationFrame(draw);
+    renderer.render(scene, camera);
   }
 
-  draw();
+  animate();
 }
 
-const GL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>/\{}[]#$%&*+=_~^';
+// --------------------------------------------------------------------------
+// HIGH-TECH WORD FORMING & CIPHER DECRYPTION ENGINE
+// Actively forms "ADI PERFORMANCE" letter-by-letter on page entry
+// --------------------------------------------------------------------------
+const TELEMETRY_GLYPHS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ<>/{}[];*+=_~^$#@';
+
+function formWordEffect(element, duration = 1800, delay = 100) {
+  // Run exclusively once on initial page entry/refresh
+  if (element._formingWord || element._hasRunOnce) return;
+  element._formingWord = true;
+  element._hasRunOnce = true;
+  element.style.whiteSpace = 'nowrap';
+
+  const targetText = element.getAttribute('data-value') || element.textContent.trim() || 'ADI PERFORMANCE';
+  const len = targetText.length;
+  
+  // Set initial encrypted telemetry state immediately (so the full word does not show at first)
+  let initialCipher = '';
+  for (let i = 0; i < len; i++) {
+    initialCipher += targetText[i] === ' ' ? ' ' : TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
+  }
+  element.textContent = initialCipher;
+
+  setTimeout(() => {
+    const startTime = performance.now();
+
+    function updateForming(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(1, elapsed / duration);
+
+      // Non-linear pacing: start fast on 'ADI', then deliberate mechanical lock-in on 'PERFORMANCE'
+      const ease = 1 - Math.pow(1 - progress, 2.5);
+      const lockedCount = Math.floor(len * ease);
+
+      let html = '';
+      for (let i = 0; i < len; i++) {
+        const char = targetText[i];
+        const isAdi = i < 3; // 'ADI'
+        if (char === ' ') {
+          html += '<span class="brand-divider" style="display:inline-block; width:0.45em;">&nbsp;</span>';
+        } else if (i < lockedCount) {
+          // Locked characters: recent lock-ins have a momentary phosphor flash, then settle clean
+          const isFreshLock = (i >= lockedCount - 2);
+          const brandColor = isAdi ? '#FFD000' : '#00F0FF';
+          if (isFreshLock) {
+            const glowColor = isAdi ? 'rgba(255, 208, 0, 0.85)' : 'rgba(0, 240, 255, 0.85)';
+            html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:#FFFFFF; text-shadow:0 0 16px ${glowColor}, 0 0 28px ${glowColor}; font-weight:900; transform:scale(1.06); transition:transform 0.15s, color 0.2s;">${char}</span>`;
+          } else {
+            html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:${brandColor}; text-shadow:none; font-weight:900;">${char}</span>`;
+          }
+        } else if (i === lockedCount) {
+          // Active Laser Scanner Head: pulsing hyper-bright neon cyan/white leading edge
+          const activeGlyph = TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
+          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:#FFFFFF; text-shadow:0 0 16px #00F0FF, 0 0 32px #00F0FF, 0 0 50px #FFFFFF; font-weight:900; transform:scale(1.15);">${activeGlyph}</span>`;
+        } else {
+          // Live Cyber Cipher Stream: glowing cyan telemetry glyphs with randomized opacity jitter
+          const cipherGlyph = TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
+          const alpha = (Math.sin(now * 0.015 + i) * 0.18 + 0.32).toFixed(2);
+          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:rgba(0, 240, 255, ${alpha}); font-weight:400; text-shadow:0 0 8px rgba(0, 240, 255, 0.35);">${cipherGlyph}</span>`;
+        }
+      }
+
+      element.innerHTML = html;
+
+      if (progress < 1) {
+        requestAnimationFrame(updateForming);
+      } else {
+        // Final locked confirmation bloom that smoothly relaxes into pure clean flat text
+        element.innerHTML = '<span class="brand-adi" style="color:#FFD000; text-shadow:0 0 25px rgba(255,208,0,0.6); display:inline-block; transition:text-shadow 0.4s ease-out;">ADI</span><span class="brand-divider" style="display:inline-block; width:0.4em;">&nbsp;</span><span class="brand-perf" style="color:#00F0FF; text-shadow:0 0 25px rgba(0,240,255,0.6); display:inline-block; transition:text-shadow 0.4s ease-out;">PERFORMANCE</span>';
+        
+        setTimeout(() => {
+          const adiSpan = element.querySelector('.brand-adi');
+          const perfSpan = element.querySelector('.brand-perf');
+          if (adiSpan) adiSpan.style.textShadow = 'none';
+          if (perfSpan) perfSpan.style.textShadow = 'none';
+        }, 320);
+
+        element._formingWord = false;
+      }
+    }
+
+    requestAnimationFrame(updateForming);
+  }, delay);
+}
 
 function scrambleText(element, duration = 850) {
-  if (element._scrambling) return;
+  if (element._scrambling || element._formingWord) return;
   element._scrambling = true;
 
   const originalText = element.getAttribute('data-value') || element.textContent.trim();
@@ -523,7 +763,7 @@ function scrambleText(element, duration = 850) {
       } else if (i < revealedLength) {
         output += originalText[i];
       } else {
-        output += GL[Math.floor(Math.random() * GL.length)];
+        output += TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
       }
     }
 
@@ -541,19 +781,19 @@ function scrambleText(element, duration = 850) {
 }
 
 function initScrambleEffects() {
-  // Scramble main hero title on page entry
+  // Hero title word-forming runs ONLY once on page load / refresh
   const heroTitle = document.querySelector('.scramble-target');
   if (heroTitle) {
-    setTimeout(() => scrambleText(heroTitle, 1200), 300);
+    // Initiate word forming animation once on load
+    formWordEffect(heroTitle, 2800, 150);
   }
 
-  // Scramble on hover for navigation links & badges
+  // Hover scramble on navigation links & badges
   const hoverLinks = document.querySelectorAll('.scramble-hover');
   hoverLinks.forEach((link) => {
     link.addEventListener('mouseenter', () => scrambleText(link, 500));
   });
 }
-
 /* ==========================================================================
    5. NUMBER COUNTERS IN HERO
    ========================================================================== */
@@ -1086,4 +1326,24 @@ function initScrollReveal() {
       isTicking = true;
     }
   }, { passive: true });
+}
+
+/* ==========================================================================
+   FLOATING BACK TO TOP CONTROLLER
+   ========================================================================== */
+function initBackToTop() {
+  const btn = document.getElementById('back-to-top');
+  if (!btn) return;
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 380) {
+      btn.classList.add('visible');
+    } else {
+      btn.classList.remove('visible');
+    }
+  }, { passive: true });
+
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 }
