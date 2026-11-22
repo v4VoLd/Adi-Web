@@ -657,8 +657,10 @@ function initMetalRingGlobe() {
 const TELEMETRY_GLYPHS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ<>/{}[];*+=_~^$#@';
 
 function formWordEffect(element, duration = 1800, delay = 100) {
-  if (element._formingWord) return;
+  // Run exclusively once on initial page entry/refresh
+  if (element._formingWord || element._hasRunOnce) return;
   element._formingWord = true;
+  element._hasRunOnce = true;
   element.style.whiteSpace = 'nowrap';
 
   const targetText = element.getAttribute('data-value') || element.textContent.trim() || 'ADI PERFORMANCE';
@@ -754,17 +756,11 @@ function scrambleText(element, duration = 850) {
 }
 
 function initScrambleEffects() {
-  // Hero title word-forming on page load
+  // Hero title word-forming runs ONLY once on page load / refresh
   const heroTitle = document.querySelector('.scramble-target');
   if (heroTitle) {
-    // Initiate word forming animation (slower, deliberate pace for cinematic luxury feel)
+    // Initiate word forming animation once on load
     formWordEffect(heroTitle, 2800, 150);
-
-    // Hover effect: re-form the word on mouse hover
-    heroTitle.style.cursor = 'pointer';
-    heroTitle.addEventListener('mouseenter', () => {
-      formWordEffect(heroTitle, 2200, 0);
-    });
   }
 
   // Hover scramble on navigation links & badges
