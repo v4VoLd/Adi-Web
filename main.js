@@ -97,22 +97,24 @@ function initMetalRingGlobe() {
   const cy = size / 2;
   const R = size * 0.44;
 
-  const startAngle = 0.38 * Math.PI; // 5:15
-  const endAngle = 2.22 * Math.PI;   // 3:45
+  const startAngle = 0.38 * Math.PI; // 0 KM/H (~5:15)
+  const endAngle = 2.22 * Math.PI;   // 340+ KM/H (~3:45)
   const sweep = endAngle - startAngle;
   const yellowStart = 1.48 * Math.PI; // 12:00
   const yellowEnd = endAngle;
 
-  // LAYER 1: Deep Matte Obsidian Base Plate with radial falloff
+  // LAYER 1: Deep Matte Obsidian Base Plate with High-Contrast Typography Vignette
   function createBaseTexture() {
     const cv = document.createElement('canvas');
     cv.width = size; cv.height = size;
     const ctx = cv.getContext('2d');
 
-    const bgGrad = ctx.createRadialGradient(cx, cy, R * 0.1, cx, cy, R * 1.05);
-    bgGrad.addColorStop(0, 'rgba(8, 11, 16, 0.90)');
-    bgGrad.addColorStop(0.55, 'rgba(6, 8, 12, 0.72)');
-    bgGrad.addColorStop(0.85, 'rgba(4, 5, 8, 0.40)');
+    // Enhanced OLED contrast behind headline wordmark
+    const bgGrad = ctx.createRadialGradient(cx, cy, R * 0.05, cx, cy, R * 1.05);
+    bgGrad.addColorStop(0, 'rgba(6, 8, 12, 0.96)');
+    bgGrad.addColorStop(0.35, 'rgba(6, 8, 12, 0.88)');
+    bgGrad.addColorStop(0.65, 'rgba(5, 7, 10, 0.65)');
+    bgGrad.addColorStop(0.88, 'rgba(4, 5, 8, 0.35)');
     bgGrad.addColorStop(1.0, 'rgba(4, 5, 8, 0)');
     ctx.fillStyle = bgGrad;
     ctx.beginPath();
@@ -120,7 +122,7 @@ function initMetalRingGlobe() {
     ctx.fill();
 
     // Subtle concentric telemetry grid lines
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.035)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
     ctx.lineWidth = 2.0;
     [0.91, 0.76, 0.62, 0.42, 0.26].forEach(rRatio => {
       ctx.beginPath();
@@ -156,7 +158,6 @@ function initMetalRingGlobe() {
       { speed: 340, a: 1.88 * Math.PI, label: '340+' }
     ];
 
-    // Fine sub-ticks along outer arc
     const totalTicks = 110;
     for (let i = 0; i <= totalTicks; i++) {
       const a = startAngle + (i / totalTicks) * sweep;
@@ -171,7 +172,6 @@ function initMetalRingGlobe() {
       ctx.stroke();
     }
 
-    // Major Ticks & Speed Numerals
     speedScale.forEach(sp => {
       const isYellow = (sp.a >= yellowStart);
       const r1 = R * 0.84;
@@ -206,7 +206,6 @@ function initMetalRingGlobe() {
     cv.width = size; cv.height = size;
     const ctx = cv.getContext('2d');
 
-    // Outer blazing golden yellow neon arc
     ctx.save();
     ctx.shadowColor = '#FFB800';
     ctx.shadowBlur = 45;
@@ -217,7 +216,6 @@ function initMetalRingGlobe() {
     ctx.stroke();
     ctx.restore();
 
-    // Radiant warm yellow filled band
     ctx.save();
     const yGlow = ctx.createRadialGradient(cx, cy, R * 0.72, cx, cy, R * 0.91);
     yGlow.addColorStop(0, 'rgba(255, 175, 0, 0.04)');
@@ -231,7 +229,6 @@ function initMetalRingGlobe() {
     ctx.fill();
     ctx.restore();
 
-    // Radial Yellow Segmented Ladder Bars
     const numLadder = 28;
     for (let i = 0; i <= numLadder; i++) {
       const a = yellowStart + (i / numLadder) * (yellowEnd - yellowStart);
@@ -245,7 +242,6 @@ function initMetalRingGlobe() {
       ctx.stroke();
     }
 
-    // Yellow Tachometer RPM Labels (6000, 7000, 8000, 9000)
     ctx.save();
     ctx.font = 'bold 38px "JetBrains Mono", monospace';
     ctx.fillStyle = '#FFE033';
@@ -274,7 +270,7 @@ function initMetalRingGlobe() {
     return new THREE.CanvasTexture(cv);
   }
 
-  // LAYER 4: Inner Cyan Concentric Arc & Telemetry (RPM, BOOST, ADI PERFORMANCE)
+  // LAYER 4: Inner Cyan Concentric Arc & Engineering Telemetry (NO Duplicate ADI Text)
   function createInnerTelemetryTexture() {
     const cv = document.createElement('canvas');
     cv.width = size; cv.height = size;
@@ -322,13 +318,13 @@ function initMetalRingGlobe() {
     ctx.fillStyle = '#00E5FF';
     ctx.fillText('BAR', cx + R * 0.42, cy + R * 0.29);
 
-    // "ADI PERFORMANCE" along lower curve
-    ctx.font = 'italic bold 32px -apple-system, sans-serif';
-    ctx.fillStyle = '#00E5FF';
+    // Replaced duplicate brand name with authentic motorsport engineering telemetry
+    ctx.font = 'bold 24px "JetBrains Mono", monospace';
+    ctx.fillStyle = 'rgba(0, 229, 255, 0.85)';
     ctx.shadowColor = '#00E5FF';
-    ctx.shadowBlur = 15;
-    ctx.letterSpacing = '5px';
-    ctx.fillText('ADI PERFORMANCE', cx + R * 0.35, cy + R * 0.48);
+    ctx.shadowBlur = 10;
+    ctx.letterSpacing = '4px';
+    ctx.fillText('STAGE 3 PROTOCOL · AWD BENCH · CAN-BUS MAP 04', cx + R * 0.35, cy + R * 0.48);
     ctx.restore();
 
     return new THREE.CanvasTexture(cv);
@@ -490,17 +486,16 @@ function initMetalRingGlobe() {
   needleGlowLight.position.set(0, 0.9, 0.22);
   needlePivot.add(needleGlowLight);
 
-  // Blueprint Disassembly Laser Guide Lines (between separated stages)
+  // Blueprint Disassembly Laser Guide Rays
   const guidesGroup = new THREE.Group();
   const guideMat = new THREE.LineDashedMaterial({
     color: 0x00e5ff,
-    dashSize: 0.12,
-    gapSize: 0.08,
+    dashSize: 0.08,
+    gapSize: 0.06,
     transparent: true,
-    opacity: 0.5
+    opacity: 0.0
   });
 
-  const guideLines = [];
   const guidePoints = [
     [-1.2, 1.2],
     [1.4, 1.4],
@@ -510,26 +505,31 @@ function initMetalRingGlobe() {
 
   guidePoints.forEach(([gx, gy]) => {
     const geo = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(gx, gy, -1.5),
-      new THREE.Vector3(gx, gy, 2.5)
+      new THREE.Vector3(gx, gy, -1.0),
+      new THREE.Vector3(gx, gy, 1.5)
     ]);
     const line = new THREE.Line(geo, guideMat);
     line.computeLineDistances();
     guidesGroup.add(line);
-    guideLines.push(line);
   });
   gaugeGroup.add(guidesGroup);
 
   // --------------------------------------------------------------------------
-  // 4. INTERACTION, PARALLAX & DISMANTLE PHYSICS ON SCROLL
+  // 4. IGNITION STARTUP NEEDLE SWEEP CEREMONY & INTERACTION PHYSICS
   // --------------------------------------------------------------------------
   let mouseX = 0;
   let mouseY = 0;
   let targetRotX = 0.44;
   let targetRotY = -0.10;
 
-  let currentNeedleAngle = -0.72;
-  let targetNeedleAngle = -0.72;
+  // Ignition Needle Sweep State
+  // Angle calibration: 1.8 = 0 KM/H, -1.0 = 340+ KM/H redline, 1.35 = ~35 KM/H idle
+  let startupSweepActive = true;
+  let startupStartTime = performance.now();
+  const startupDuration = 1400; // 1.4 seconds smooth sweep
+
+  let currentNeedleAngle = 1.8; // Starts at 0 KM/H
+  let targetNeedleAngle = 1.35; // Settles at idle (~35 KM/H)
   let scrollVel = 0;
   let lastY = window.scrollY;
 
@@ -542,8 +542,10 @@ function initMetalRingGlobe() {
     targetRotX = 0.44 + ny * 0.25;
     targetRotY = -0.10 + nx * 0.32;
 
-    const speedFrac = Math.max(0, Math.min(1, (nx + 0.5) * 0.85));
-    targetNeedleAngle = 1.6 - speedFrac * 2.6;
+    if (!startupSweepActive) {
+      const speedFrac = Math.max(0, Math.min(1, (nx + 0.5) * 0.85));
+      targetNeedleAngle = 1.6 - speedFrac * 2.6;
+    }
   }, { passive: true });
 
   window.addEventListener('scroll', () => {
@@ -563,10 +565,37 @@ function initMetalRingGlobe() {
   function animate() {
     requestAnimationFrame(animate);
     const elapsedTime = clock.getElapsedTime();
+    const now = performance.now();
 
-    // Scroll Progress Calculation (0 = at top, 1 = deep scroll)
-    const scrollProgress = Math.min(1.2, Math.max(0, window.scrollY / (window.innerHeight * 0.85)));
-    const fade = Math.max(0, 1 - Math.pow(scrollProgress / 1.15, 1.8));
+    // ------------------------------------------------------------------------
+    // A. Startup Needle Sweep Ceremony (Porsche / GT3 Ignition Check)
+    // ------------------------------------------------------------------------
+    if (startupSweepActive) {
+      const elapsed = now - startupStartTime;
+      const t = Math.min(1, elapsed / startupDuration);
+
+      if (t < 0.55) {
+        // Phase 1: Rapid rev from 0 to 340+ KM/H redline (0 -> 1.8 to -0.85)
+        const p1 = t / 0.55;
+        const easeRev = 1 - Math.pow(1 - p1, 3);
+        currentNeedleAngle = 1.8 - easeRev * 2.65;
+      } else if (t < 1.0) {
+        // Phase 2: Smooth settling return to idle ~35 KM/H (-0.85 -> 1.35)
+        const p2 = (t - 0.55) / 0.45;
+        const easeReturn = 1 - Math.pow(1 - p2, 2);
+        currentNeedleAngle = -0.85 + easeReturn * 2.2;
+      } else {
+        startupSweepActive = false;
+        targetNeedleAngle = 1.35;
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // B. Controlled Scroll Disassembly & Fade Dynamics
+    // ------------------------------------------------------------------------
+    const scrollProgress = Math.min(1.0, Math.max(0, window.scrollY / (window.innerHeight * 0.72)));
+    // Dissolves smoothly before reaching the next section title
+    const fade = Math.max(0, 1 - Math.pow(scrollProgress / 0.88, 2.2));
 
     if (fade <= 0.01) {
       renderer.clear();
@@ -578,33 +607,31 @@ function initMetalRingGlobe() {
     gaugeGroup.rotation.y += (targetRotY - gaugeGroup.rotation.y) * 0.05;
     gaugeGroup.position.y = baseGaugeY - window.scrollY * 0.0016;
 
-    // ------------------------------------------------------------------------
-    // 3D DISASSEMBLY (DISMANTLE) DYNAMICS ON SCROLL
-    // ------------------------------------------------------------------------
-    // Layer 5 (Needle & Billet Hub): Flies forward in Z towards user
-    needlePivot.position.z = 0.08 + scrollProgress * 3.4;
-    needlePivot.rotation.x = scrollProgress * 0.35;
+    // Surgical Controlled 3D Separation (No exaggerated camera collisions)
+    // Needle & Billet Hub: Controlled lift forward
+    needlePivot.position.z = 0.08 + scrollProgress * 1.35;
+    needlePivot.rotation.x = scrollProgress * 0.18;
 
-    // Layer 4 (Inner Cyan Telemetry Ring): Floats forward in mid-plane
-    innerMesh.position.z = 0.03 + scrollProgress * 1.8;
-    innerMesh.scale.set(1 + scrollProgress * 0.12, 1 + scrollProgress * 0.12, 1);
+    // Inner Cyan Telemetry Ring: Mid-plane lift
+    innerMesh.position.z = 0.03 + scrollProgress * 0.75;
+    innerMesh.scale.set(1 + scrollProgress * 0.08, 1 + scrollProgress * 0.08, 1);
 
-    // Layer 3 (Speed Yellow Power Band): Displaces outward & upward
-    yellowMesh.position.z = 0.02 + scrollProgress * 1.1;
-    yellowMesh.position.x = scrollProgress * 0.85;
-    yellowMesh.position.y = scrollProgress * 0.55;
+    // Speed Yellow Power Band: Graceful upper-right expansion
+    yellowMesh.position.z = 0.02 + scrollProgress * 0.55;
+    yellowMesh.position.x = scrollProgress * 0.45;
+    yellowMesh.position.y = scrollProgress * 0.30;
 
-    // Layer 2 (Outer Scale 0-340 KM/H): Expands outward radially and recedes
-    outerMesh.position.z = 0.01 - scrollProgress * 1.2;
-    outerMesh.scale.set(1 + scrollProgress * 0.32, 1 + scrollProgress * 0.32, 1);
+    // Outer Scale (0-340 KM/H): Subtle radial expansion
+    outerMesh.position.z = 0.01 - scrollProgress * 0.65;
+    outerMesh.scale.set(1 + scrollProgress * 0.18, 1 + scrollProgress * 0.18, 1);
 
-    // Layer 1 (Base Plate): Drops deep into background and fades
-    baseMesh.position.z = -scrollProgress * 2.6;
+    // Base Plate: Controlled recession
+    baseMesh.position.z = -scrollProgress * 1.2;
 
-    // Blueprint Guides: Become visible as disassembly progresses
-    guideMat.opacity = Math.sin(scrollProgress * Math.PI) * 0.55 * fade;
+    // Blueprint Guides: Subtle pulse during mid-disassembly
+    guideMat.opacity = Math.sin(scrollProgress * Math.PI) * 0.40 * fade;
 
-    // Opacity fade across layers
+    // Smooth Opacity Fade across all layers
     baseMat.opacity = 0.95 * fade;
     outerMat.opacity = 0.95 * fade;
     yellowMat.opacity = 0.95 * fade;
@@ -612,12 +639,16 @@ function initMetalRingGlobe() {
     needleMat.opacity = fade;
     needleMat.transparent = fade < 0.99;
 
-    // Scroll Rev Acceleration
-    const scrollSurge = Math.min(1.8, Math.abs(scrollVel) * 0.08 + scrollProgress * 1.5);
-    scrollVel *= 0.92;
+    // ------------------------------------------------------------------------
+    // C. Dynamic Engine Rev & Idle Rumble Physics
+    // ------------------------------------------------------------------------
+    if (!startupSweepActive) {
+      const scrollSurge = Math.min(2.0, Math.abs(scrollVel) * 0.08 + scrollProgress * 1.6);
+      scrollVel *= 0.92;
 
-    const idlePulse = Math.sin(elapsedTime * 4.5) * 0.02 + Math.sin(elapsedTime * 9.2) * 0.01;
-    currentNeedleAngle += (targetNeedleAngle - scrollSurge + idlePulse - currentNeedleAngle) * 0.08;
+      const idlePulse = Math.sin(elapsedTime * 4.5) * 0.025 + Math.sin(elapsedTime * 9.2) * 0.012;
+      currentNeedleAngle += (targetNeedleAngle - scrollSurge + idlePulse - currentNeedleAngle) * 0.08;
+    }
 
     needlePivot.rotation.z = currentNeedleAngle;
 
