@@ -27,6 +27,7 @@
   
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
+  --font-racing: 'Rajdhani', 'Chakra Petch', -apple-system, sans-serif;
   
   --radius-sm: 6px;
   --radius-md: 12px;
@@ -273,9 +274,10 @@ body {
 }
 
 .logo-text b {
-  font-size: 1rem;
+  font-family: var(--font-racing);
+  font-size: 1.12rem;
   font-weight: 800;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
 }
 
 .logo-text .logo-adi {
@@ -462,10 +464,12 @@ body {
 }
 
 .hero-title {
-  font-size: clamp(2.8rem, 5.6vw, 5.2rem);
-  font-weight: 900;
-  letter-spacing: -1px;
-  line-height: 1.15;
+  font-family: var(--font-racing);
+  font-size: clamp(3.2rem, 6.4vw, 5.8rem);
+  font-weight: 800;
+  letter-spacing: 2px;
+  line-height: 1.1;
+  text-transform: uppercase;
   margin-bottom: 1.6rem;
   white-space: nowrap !important;
   display: inline-block;
