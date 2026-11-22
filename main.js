@@ -720,8 +720,8 @@ function formWordEffect(element, duration = 1800, delay = 100) {
       if (progress < 1) {
         requestAnimationFrame(updateForming);
       } else {
-        // Final locked-in state: High-Voltage dual-tone motorsport gradient
-        element.innerHTML = '<span class="brand-adi" style="background: linear-gradient(135deg, #FFF066 0%, #FFD000 45%, #FF8800 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 25px rgba(255, 208, 0, 0.7)); display: inline-block;">ADI</span><span class="brand-divider" style="display:inline-block; width:0.4em;">&nbsp;</span><span class="brand-perf" style="background: linear-gradient(135deg, #FFFFFF 0%, #B8F0FF 40%, #00F0FF 75%, #0090DF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 28px rgba(0, 240, 255, 0.65)); display: inline-block;">PERFORMANCE</span>';
+        // Final locked-in state: Pure two-tone neon brand colors matching the forming sequence exactly
+        element.innerHTML = '<span class="brand-adi" style="color:#FFD000; text-shadow: 0 0 20px rgba(255,208,0,0.85), 0 0 45px rgba(255,180,0,0.5); display:inline-block;">ADI</span><span class="brand-divider" style="display:inline-block; width:0.4em;">&nbsp;</span><span class="brand-perf" style="color:#00F0FF; text-shadow: 0 0 20px rgba(0,240,255,0.85), 0 0 45px rgba(0,163,224,0.5); display:inline-block;">PERFORMANCE</span>';
         element._formingWord = false;
       }
     }
