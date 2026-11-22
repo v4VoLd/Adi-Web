@@ -591,45 +591,37 @@ function initMetalRingGlobe() {
     }
 
     // ------------------------------------------------------------------------
-    // B. Controlled Scroll Disassembly & Fade Dynamics
+    // B. Clean Parallax Fade Dynamics (Cohesive Instrument, Zero Debris)
     // ------------------------------------------------------------------------
-    const scrollProgress = Math.min(1.0, Math.max(0, window.scrollY / (window.innerHeight * 0.72)));
-    // Dissolves smoothly before reaching the next section title
-    const fade = Math.max(0, 1 - Math.pow(scrollProgress / 0.88, 2.2));
+    const scrollDistance = window.scrollY;
+    // Fast, elegant fade: dissolves cleanly within the first 260px of scroll
+    const fadeProgress = Math.min(1.0, scrollDistance / 260);
+    const fade = Math.max(0, 1 - Math.pow(fadeProgress, 1.4));
 
-    if (fade <= 0.01) {
+    if (fade <= 0.001) {
       renderer.clear();
       return;
     }
 
-    // Parallax Interpolation
+    // Parallax Interpolation (Naturally ascends with hero content)
     gaugeGroup.rotation.x += (targetRotX - gaugeGroup.rotation.x) * 0.05;
     gaugeGroup.rotation.y += (targetRotY - gaugeGroup.rotation.y) * 0.05;
-    gaugeGroup.position.y = baseGaugeY - window.scrollY * 0.0016;
+    gaugeGroup.position.y = baseGaugeY - scrollDistance * 0.0032;
+    
+    // Subtle cohesive scale recession on scroll
+    const scaleFactor = 1 - fadeProgress * 0.06;
+    gaugeGroup.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-    // Surgical Controlled 3D Separation (No exaggerated camera collisions)
-    // Needle & Billet Hub: Controlled lift forward
-    needlePivot.position.z = 0.08 + scrollProgress * 1.35;
-    needlePivot.rotation.x = scrollProgress * 0.18;
-
-    // Inner Cyan Telemetry Ring: Mid-plane lift
-    innerMesh.position.z = 0.03 + scrollProgress * 0.75;
-    innerMesh.scale.set(1 + scrollProgress * 0.08, 1 + scrollProgress * 0.08, 1);
-
-    // Speed Yellow Power Band: Graceful upper-right expansion
-    yellowMesh.position.z = 0.02 + scrollProgress * 0.55;
-    yellowMesh.position.x = scrollProgress * 0.45;
-    yellowMesh.position.y = scrollProgress * 0.30;
-
-    // Outer Scale (0-340 KM/H): Subtle radial expansion
-    outerMesh.position.z = 0.01 - scrollProgress * 0.65;
-    outerMesh.scale.set(1 + scrollProgress * 0.18, 1 + scrollProgress * 0.18, 1);
-
-    // Base Plate: Controlled recession
-    baseMesh.position.z = -scrollProgress * 1.2;
-
-    // Blueprint Guides: Subtle pulse during mid-disassembly
-    guideMat.opacity = Math.sin(scrollProgress * Math.PI) * 0.40 * fade;
+    // Keep all instrument layers calibrated and unified (no exploded fragments)
+    needlePivot.position.set(0, 0, 0.08);
+    needlePivot.rotation.x = 0;
+    innerMesh.position.set(0, 0, 0.03);
+    innerMesh.scale.set(1, 1, 1);
+    yellowMesh.position.set(0, 0, 0.02);
+    outerMesh.position.set(0, 0, 0.01);
+    outerMesh.scale.set(1, 1, 1);
+    baseMesh.position.set(0, 0, 0);
+    guideMat.opacity = 0;
 
     // Smooth Opacity Fade across all layers
     baseMat.opacity = 0.95 * fade;
@@ -637,13 +629,13 @@ function initMetalRingGlobe() {
     yellowMat.opacity = 0.95 * fade;
     innerMat.opacity = 0.95 * fade;
     needleMat.opacity = fade;
-    needleMat.transparent = fade < 0.99;
+    needleMat.transparent = true;
 
     // ------------------------------------------------------------------------
     // C. Dynamic Engine Rev & Idle Rumble Physics
     // ------------------------------------------------------------------------
     if (!startupSweepActive) {
-      const scrollSurge = Math.min(2.0, Math.abs(scrollVel) * 0.08 + scrollProgress * 1.6);
+      const scrollSurge = Math.min(2.0, Math.abs(scrollVel) * 0.08 + fadeProgress * 1.6);
       scrollVel *= 0.92;
 
       const idlePulse = Math.sin(elapsedTime * 4.5) * 0.025 + Math.sin(elapsedTime * 9.2) * 0.012;
