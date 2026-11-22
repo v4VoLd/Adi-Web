@@ -288,34 +288,28 @@ function initMetalRingGlobe() {
     ctx.stroke();
     ctx.restore();
 
-    // "KM/H"
+    // Secondary concentric telemetry ring
     ctx.save();
-    ctx.font = 'bold 36px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.textAlign = 'center';
-    ctx.letterSpacing = '4px';
-    ctx.fillText('KM/H', cx + R * 0.12, cy + R * 0.15);
+    ctx.strokeStyle = 'rgba(0, 229, 255, 0.25)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(cx, cy, R * 0.40, 0, 2 * Math.PI);
+    ctx.stroke();
 
-    // "BOOST 2.4 BAR"
-    ctx.font = 'bold 24px "JetBrains Mono", monospace';
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-    ctx.fillText('BOOST', cx + R * 0.16, cy + R * 0.28);
-
-    ctx.font = 'bold 50px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillText('2.4', cx + R * 0.28, cy + R * 0.30);
-
-    ctx.font = 'bold 22px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#00E5FF';
-    ctx.fillText('BAR', cx + R * 0.42, cy + R * 0.29);
-
-    // Replaced duplicate brand name with authentic motorsport engineering telemetry
-    ctx.font = 'bold 24px "JetBrains Mono", monospace';
-    ctx.fillStyle = 'rgba(0, 229, 255, 0.85)';
-    ctx.shadowColor = '#00E5FF';
-    ctx.shadowBlur = 10;
-    ctx.letterSpacing = '4px';
-    ctx.fillText('STAGE 3 PROTOCOL · AWD BENCH · CAN-BUS MAP 04', cx + R * 0.35, cy + R * 0.48);
+    // Subtle radial tick marks along inner ring
+    const innerTicks = 36;
+    for (let i = 0; i < innerTicks; i++) {
+      const a = (i / innerTicks) * 2 * Math.PI;
+      const isMajor = (i % 6 === 0);
+      const r1 = R * (isMajor ? 0.37 : 0.39);
+      const r2 = R * 0.41;
+      ctx.strokeStyle = isMajor ? 'rgba(0, 240, 255, 0.65)' : 'rgba(0, 240, 255, 0.20)';
+      ctx.lineWidth = isMajor ? 2.0 : 1.0;
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
+      ctx.lineTo(cx + Math.cos(a) * r2, cy + Math.sin(a) * r2);
+      ctx.stroke();
+    }
     ctx.restore();
 
     return new THREE.CanvasTexture(cv);
@@ -355,14 +349,14 @@ function initMetalRingGlobe() {
   // --------------------------------------------------------------------------
   // 3. EXPLODABLE 3D GAUGE ASSEMBLY (SEPARATED LAYERS)
   // --------------------------------------------------------------------------
-  const baseGaugeY = 0.08;
+  const baseGaugeY = -0.06;
   const gaugeGroup = new THREE.Group();
   gaugeGroup.rotation.x = 0.44;
   gaugeGroup.rotation.y = -0.10;
   gaugeGroup.position.set(0, baseGaugeY, 0);
   scene.add(gaugeGroup);
 
-  const dialRadius = 2.25;
+  const dialRadius = 1.95;
 
   // LAYER 1: Base Plate Mesh
   const baseTex = createBaseTexture();
@@ -514,13 +508,17 @@ function initMetalRingGlobe() {
   let targetRotY = -0.10;
 
   // Ignition Needle Sweep State
-  // Angle calibration: 1.8 = 0 KM/H, -1.0 = 340+ KM/H redline, 1.35 = ~35 KM/H idle
+  // Angle calibration: -2.76 = 0 KM/H (points down-right), +0.40 = Redline (points top)
+  const NEEDLE_ZERO = -2.76;
+  const NEEDLE_MAX = 0.40;
+  const NEEDLE_SWEEP = NEEDLE_MAX - NEEDLE_ZERO; // 3.16 rad
+
   let startupSweepActive = true;
   let startupStartTime = performance.now();
   const startupDuration = 1800; // Synchronized with deliberate text-forming sweep
 
-  let currentNeedleAngle = 1.8; // Starts at 0 KM/H
-  let targetNeedleAngle = 1.8; // Settles at 0 KM/H bench ready
+  let currentNeedleAngle = NEEDLE_ZERO; // Starts at 0 KM/H
+  let targetNeedleAngle = NEEDLE_ZERO; // Settles at 0 KM/H bench ready
   let scrollVel = 0;
   let lastY = window.scrollY;
 
@@ -535,7 +533,7 @@ function initMetalRingGlobe() {
 
     if (!startupSweepActive) {
       const speedFrac = Math.max(0, Math.min(1, (nx + 0.5) * 0.85));
-      targetNeedleAngle = 1.8 - speedFrac * 2.65;
+      targetNeedleAngle = NEEDLE_ZERO + speedFrac * NEEDLE_SWEEP;
     }
   }, { passive: true });
 
@@ -566,18 +564,18 @@ function initMetalRingGlobe() {
       const t = Math.min(1, elapsed / startupDuration);
 
       if (t < 0.55) {
-        // Phase 1: Rapid rev from 0 to 340+ KM/H redline (0 -> 1.8 to -0.85)
+        // Phase 1: Rapid rev from 0 to redline
         const p1 = t / 0.55;
         const easeRev = 1 - Math.pow(1 - p1, 3);
-        currentNeedleAngle = 1.8 - easeRev * 2.65;
+        currentNeedleAngle = NEEDLE_ZERO + easeRev * NEEDLE_SWEEP;
       } else if (t < 1.0) {
         // Phase 2: Smooth settling return to 0 KM/H bench ready
         const p2 = (t - 0.55) / 0.45;
         const easeReturn = 1 - Math.pow(1 - p2, 2);
-        currentNeedleAngle = -0.85 + easeReturn * 2.65;
+        currentNeedleAngle = NEEDLE_MAX - easeReturn * NEEDLE_SWEEP;
       } else {
         startupSweepActive = false;
-        targetNeedleAngle = 1.8;
+        targetNeedleAngle = NEEDLE_ZERO;
       }
     }
 
