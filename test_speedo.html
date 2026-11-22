@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADI Performance — 3D Motorsport Gauge Masterpiece</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #040508;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+    #canvas-container {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    .hud-overlay {
+      position: absolute;
+      top: 2rem;
+      left: 2.5rem;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .hud-title {
+      font-family: monospace;
+      font-size: 0.9rem;
+      color: #FFD000;
+      letter-spacing: 3px;
+      font-weight: 700;
+    }
+    .hud-sub {
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: #00E5FF;
+      margin-top: 0.35rem;
+      letter-spacing: 1.5px;
+    }
+    .instructions {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.45);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      z-index: 10;
+      pointer-events: none;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+  <div class="hud-overlay">
+    <div class="hud-title">ADI PERFORMANCE · 3D INSTRUMENT CLUSTER</div>
+    <div class="hud-sub">HIGH-OCTANE MOTORSPORT TELEMETRY GAUGE</div>
+  </div>
+  <div class="instructions">Parallax Tilt: Move Mouse · Dynamic Rev: Hover &amp; Scroll</div>
+  <div id="canvas-container"></div>
+
+  <script>
+    // --------------------------------------------------------------------------
+    // 1. EXACT PROCEDURAL 4K DIAL TEXTURE (2048 x 2048)
+    // --------------------------------------------------------------------------
+    function createDialTexture() {
+      const size = 2048;
+      const cv = document.createElement('canvas');
+      cv.width = size;
+      cv.height = size;
+      const ctx = cv.getContext('2d');
+      const cx = size / 2;
+      const cy = size / 2;
+      const R = size * 0.435;
+
+      // Deep obsidian matte dial face with soft radial falloff
+      const bgGrad = ctx.createRadialGradient(cx, cy, R * 0.05, cx, cy, R * 1.02);
+      bgGrad.addColorStop(0, '#0a0d14');
+      bgGrad.addColorStop(0.65, '#05070a');
+      bgGrad.addColorStop(1, '#020305');
+      ctx.fillStyle = bgGrad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Subtle concentric telemetry grid lines
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.035)';
+      ctx.lineWidth = 2.0;
+      [0.91, 0.76, 0.62, 0.42, 0.26].forEach(rRatio => {
+        ctx.beginPath();
+        ctx.arc(cx, cy, R * rRatio, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+
+      // ------------------------------------------------------------------------
+      // EXACT ANGLE LAYOUT MATCHING USER REFERENCE:
+      // - 0 KM/H starts at ~5:15 (0.38π rad)
+      // - Sweeps CLOCKWISE past 6:00, 9:00, 12:00, to ~3:45 (2.22π)
+      // ------------------------------------------------------------------------
+      const startAngle = 0.38 * Math.PI;
+      const endAngle = 2.22 * Math.PI;
+      const sweep = endAngle - startAngle;
+
+      // ------------------------------------------------------------------------
+      // A. WARM SPEED YELLOW POWER BAND & REDLINE RPM SECTOR (12:00 to 3:45)
+      // RPM: 6000, 7000, 8000, 9000
+      // ------------------------------------------------------------------------
+      const yellowStart = 1.48 * Math.PI;
+      const yellowEnd = endAngle;
+
+      // Outer blazing warm golden yellow neon arc
+      ctx.save();
+      ctx.shadowColor = '#FFB800';
+      ctx.shadowBlur = 45;
+      ctx.strokeStyle = '#FFC000';
+      ctx.lineWidth = 26;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R * 0.90, yellowStart, yellowEnd);
+      ctx.stroke();
+      ctx.restore();
+
+      // Radiant warm yellow filled band
+      ctx.save();
+      const yGlow = ctx.createRadialGradient(cx, cy, R * 0.72, cx, cy, R * 0.91);
+      yGlow.addColorStop(0, 'rgba(255, 175, 0, 0.04)');
+      yGlow.addColorStop(0.6, 'rgba(255, 195, 0, 0.20)');
+      yGlow.addColorStop(1, 'rgba(255, 210, 0, 0.42)');
+      ctx.fillStyle = yGlow;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R * 0.905, yellowStart, yellowEnd);
+      ctx.arc(cx, cy, R * 0.72, yellowEnd, yellowStart, true);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      // Radial Yellow Segmented Ladder Bars
+      const numLadder = 28;
+      for (let i = 0; i <= numLadder; i++) {
+        const a = yellowStart + (i / numLadder) * (yellowEnd - yellowStart);
+        const r1 = R * 0.73;
+        const r2 = R * 0.89;
+        ctx.strokeStyle = '#FFD500';
+        ctx.lineWidth = (i % 7 === 0) ? 7 : 3.2;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
+        ctx.lineTo(cx + Math.cos(a) * r2, cy + Math.sin(a) * r2);
+        ctx.stroke();
+      }
+
+      // Yellow Tachometer RPM Labels (6000, 7000, 8000, 9000)
+      ctx.save();
+      ctx.font = 'bold 38px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#FFE033';
+      ctx.shadowColor = '#FFAA00';
+      ctx.shadowBlur = 12;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const rpms = [
+        { label: '6000', a: 1.58 * Math.PI },
+        { label: '7000', a: 1.76 * Math.PI },
+        { label: '8000', a: 1.94 * Math.PI },
+        { label: '9000', a: 2.12 * Math.PI }
+      ];
+      rpms.forEach(rpm => {
+        const tr = R * 0.65;
+        const tx = cx + Math.cos(rpm.a) * tr;
+        const ty = cy + Math.sin(rpm.a) * tr;
+        ctx.save();
+        ctx.translate(tx, ty);
+        ctx.rotate(rpm.a + Math.PI / 2);
+        ctx.fillText(rpm.label, 0, 0);
+        ctx.restore();
+      });
+      ctx.restore();
+
+      // ------------------------------------------------------------------------
+      // B. SPEEDOMETER TICKS & NUMERALS (0 to 340+ KM/H)
+      // ------------------------------------------------------------------------
+      const speedScale = [
+        { speed: 0, a: 0.38 * Math.PI, label: '0' },
+        { speed: 20, a: 0.48 * Math.PI, label: '20' },
+        { speed: 40, a: 0.58 * Math.PI, label: '40' },
+        { speed: 60, a: 0.68 * Math.PI, label: '60' },
+        { speed: 80, a: 0.78 * Math.PI, label: '80' },
+        { speed: 100, a: 0.88 * Math.PI, label: '100' },
+        { speed: 150, a: 1.02 * Math.PI, label: '150' },
+        { speed: 170, a: 1.12 * Math.PI, label: '170' },
+        { speed: 200, a: 1.22 * Math.PI, label: '200' },
+        { speed: 220, a: 1.30 * Math.PI, label: '220' },
+        { speed: 240, a: 1.38 * Math.PI, label: '240' },
+        { speed: 260, a: 1.48 * Math.PI, label: '260' },
+        { speed: 280, a: 1.58 * Math.PI, label: '280' },
+        { speed: 300, a: 1.68 * Math.PI, label: '300' },
+        { speed: 320, a: 1.78 * Math.PI, label: '320' },
+        { speed: 340, a: 1.88 * Math.PI, label: '340+' }
+      ];
+
+      // Fine sub-ticks along outer ring
+      const totalTicks = 110;
+      for (let i = 0; i <= totalTicks; i++) {
+        const a = startAngle + (i / totalTicks) * sweep;
+        const isYellow = (a >= yellowStart);
+        const r1 = R * 0.875;
+        const r2 = R * 0.905;
+        ctx.strokeStyle = isYellow ? '#FFC000' : 'rgba(255, 255, 255, 0.45)';
+        ctx.lineWidth = 2.8;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
+        ctx.lineTo(cx + Math.cos(a) * r2, cy + Math.sin(a) * r2);
+        ctx.stroke();
+      }
+
+      // Major Ticks & Speed Numerals
+      speedScale.forEach(sp => {
+        const isYellow = (sp.a >= yellowStart);
+        const r1 = R * 0.84;
+        const r2 = R * 0.915;
+        ctx.strokeStyle = isYellow ? '#FFC000' : '#FFFFFF';
+        ctx.lineWidth = 5.5;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(sp.a) * r1, cy + Math.sin(sp.a) * r1);
+        ctx.lineTo(cx + Math.cos(sp.a) * r2, cy + Math.sin(sp.a) * r2);
+        ctx.stroke();
+
+        // Speed Numeral inside tick
+        const tr = R * 0.77;
+        const tx = cx + Math.cos(sp.a) * tr;
+        const ty = cy + Math.sin(sp.a) * tr;
+        ctx.save();
+        ctx.translate(tx, ty);
+        ctx.rotate(sp.a + Math.PI / 2);
+        ctx.font = 'bold 34px "JetBrains Mono", sans-serif';
+        ctx.fillStyle = isYellow ? '#FFE033' : '#FFFFFF';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(sp.label, 0, 0);
+        ctx.restore();
+      });
+
+      // ------------------------------------------------------------------------
+      // C. INNER ELECTRIC CYAN CONCENTRIC ARC & "RPM"
+      // ------------------------------------------------------------------------
+      ctx.save();
+      ctx.shadowColor = '#00F0FF';
+      ctx.shadowBlur = 32;
+      ctx.strokeStyle = '#00E5FF';
+      ctx.lineWidth = 11;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R * 0.52, 0.65 * Math.PI, 2.15 * Math.PI);
+      ctx.stroke();
+      ctx.restore();
+
+      // "RPM" in top center
+      ctx.save();
+      ctx.font = 'bold 44px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+      ctx.fillStyle = '#FFFFFF';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.letterSpacing = '6px';
+      ctx.fillText('RPM', cx, cy - R * 0.32);
+      ctx.restore();
+
+      // ------------------------------------------------------------------------
+      // D. LOWER TELEMETRY (KM/H, BOOST 2.4 BAR, ADI PERFORMANCE)
+      // ------------------------------------------------------------------------
+      // "KM/H"
+      ctx.save();
+      ctx.font = 'bold 36px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#FFFFFF';
+      ctx.textAlign = 'center';
+      ctx.letterSpacing = '4px';
+      ctx.fillText('KM/H', cx + R * 0.12, cy + R * 0.15);
+
+      // "BOOST 2.4 BAR"
+      ctx.font = 'bold 24px "JetBrains Mono", monospace';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+      ctx.fillText('BOOST', cx + R * 0.16, cy + R * 0.28);
+
+      ctx.font = 'bold 50px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillText('2.4', cx + R * 0.28, cy + R * 0.30);
+
+      ctx.font = 'bold 22px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#00E5FF';
+      ctx.fillText('BAR', cx + R * 0.42, cy + R * 0.29);
+
+      // "ADI PERFORMANCE" along lower curve
+      ctx.font = 'italic bold 32px -apple-system, sans-serif';
+      ctx.fillStyle = '#00E5FF';
+      ctx.shadowColor = '#00E5FF';
+      ctx.shadowBlur = 15;
+      ctx.letterSpacing = '5px';
+      ctx.fillText('ADI PERFORMANCE', cx + R * 0.35, cy + R * 0.48);
+      ctx.restore();
+
+      return new THREE.CanvasTexture(cv);
+    }
+
+    // --------------------------------------------------------------------------
+    // 2. THREE.JS 3D SCENE & REALISTIC STUDIO LIGHTING RIG
+    // --------------------------------------------------------------------------
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x040508);
+
+    const camera = new THREE.PerspectiveCamera(34, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 0, 7.0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.25;
+    container.appendChild(renderer.domElement);
+
+    // Studio Lighting Rig
+    const ambientLight = new THREE.AmbientLight(0x1a202c, 1.6);
+    scene.add(ambientLight);
+
+    // Key Light from top-left (Brushed Titanium Specular Gleams)
+    const keyLight = new THREE.DirectionalLight(0xffffff, 3.6);
+    keyLight.position.set(-5.0, 6.0, 5.0);
+    scene.add(keyLight);
+
+    // Secondary Neutral Fill Light
+    const fillLight = new THREE.DirectionalLight(0x7a8ca0, 1.2);
+    fillLight.position.set(4.0, 4.0, 3.5);
+    scene.add(fillLight);
+
+    // Subtle Rim Light from bottom
+    const rimLight = new THREE.DirectionalLight(0x354558, 0.8);
+    rimLight.position.set(0, -5.0, 3.0);
+    scene.add(rimLight);
+
+    // Dedicated Warm Speed Yellow Spotlight on Redline Sector
+    const yellowSpot = new THREE.SpotLight(0xffb800, 5.5, 7.0, Math.PI / 4, 0.45, 1.0);
+    yellowSpot.position.set(2.4, 2.6, 2.8);
+    scene.add(yellowSpot);
+
+    // --------------------------------------------------------------------------
+    // 3. BUILD 3D GAUGE ASSEMBLY
+    // --------------------------------------------------------------------------
+    const gaugeGroup = new THREE.Group();
+    // Default Isometric Oblique cockpit tilt angle matching reference photo exactly
+    gaugeGroup.rotation.x = 0.52;  // Tilted back ~30 degrees
+    gaugeGroup.rotation.y = -0.14; // Turned slightly to right (~8 degrees)
+    gaugeGroup.position.set(0, 0, 0);
+    scene.add(gaugeGroup);
+
+    const dialRadius = 2.15;
+
+    // A. Recessed Dial Face with High-Res Texture
+    const dialTex = createDialTexture();
+    dialTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    const dialGeo = new THREE.CircleGeometry(dialRadius, 64);
+    const dialMat = new THREE.MeshStandardMaterial({
+      map: dialTex,
+      roughness: 0.65,
+      metalness: 0.10
+    });
+    const dialMesh = new THREE.Mesh(dialGeo, dialMat);
+    dialMesh.position.z = 0;
+    gaugeGroup.add(dialMesh);
+
+    // B. Machined Titanium Outer Bezel (Gunmetal Titanium #545c6b)
+    const titaniumMat = new THREE.MeshStandardMaterial({
+      color: 0x5a6372,
+      roughness: 0.32,
+      metalness: 0.90
+    });
+
+    const darkTitaniumMat = new THREE.MeshStandardMaterial({
+      color: 0x1e242d,
+      roughness: 0.45,
+      metalness: 0.85
+    });
+
+    // 1. Outer Main Bezel Ring Face
+    const outerRingGeo = new THREE.RingGeometry(dialRadius * 0.98, dialRadius * 1.13, 64);
+    const outerRingMesh = new THREE.Mesh(outerRingGeo, titaniumMat);
+    outerRingMesh.position.z = 0.14;
+    gaugeGroup.add(outerRingMesh);
+
+    // 2. Bezel Outer Slanted Chamfer Collar
+    const chamferGeo = new THREE.CylinderGeometry(dialRadius * 1.13, dialRadius * 1.18, 0.15, 64, 1, true);
+    chamferGeo.rotateX(Math.PI / 2);
+    const chamferMesh = new THREE.Mesh(chamferGeo, titaniumMat);
+    chamferMesh.position.z = 0.065;
+    gaugeGroup.add(chamferMesh);
+
+    // 3. Outer Barrel Wall
+    const barrelGeo = new THREE.CylinderGeometry(dialRadius * 1.18, dialRadius * 1.18, 0.12, 64, 1, true);
+    barrelGeo.rotateX(Math.PI / 2);
+    const barrelMesh = new THREE.Mesh(barrelGeo, darkTitaniumMat);
+    barrelMesh.position.z = -0.06;
+    gaugeGroup.add(barrelMesh);
+
+    // 4. Inner Recessed Shadow Collar (Drops down from bezel to dial face)
+    const innerCollarGeo = new THREE.CylinderGeometry(dialRadius * 0.98, dialRadius * 0.98, 0.16, 64, 1, true);
+    innerCollarGeo.rotateX(Math.PI / 2);
+    const innerCollarMesh = new THREE.Mesh(innerCollarGeo, darkTitaniumMat);
+    innerCollarMesh.position.z = 0.07;
+    gaugeGroup.add(innerCollarMesh);
+
+    // C. 6 Allen-Key Hex Bolts & Mounting Lugs around Rim (0, 60, 120, 180, 240, 300 deg)
+    const boltGroup = new THREE.Group();
+    const boltHeadMat = new THREE.MeshStandardMaterial({ color: 0x94a2b5, roughness: 0.22, metalness: 0.96 });
+    const hexSocketMat = new THREE.MeshStandardMaterial({ color: 0x05070a, roughness: 0.85, metalness: 0.15 });
+
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2;
+      const boltR = dialRadius * 1.10;
+      const bx = Math.cos(a) * boltR;
+      const by = Math.sin(a) * boltR;
+
+      // Lug Boss (Cylindrical flange on bezel)
+      const lugGeo = new THREE.CylinderGeometry(0.12, 0.14, 0.17, 20);
+      lugGeo.rotateX(Math.PI / 2);
+      const lugMesh = new THREE.Mesh(lugGeo, titaniumMat);
+      lugMesh.position.set(bx, by, 0.15);
+      boltGroup.add(lugMesh);
+
+      // Bolt Head (Allen Bolt)
+      const bHeadGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.05, 20);
+      bHeadGeo.rotateX(Math.PI / 2);
+      const bHead = new THREE.Mesh(bHeadGeo, boltHeadMat);
+      bHead.position.set(bx, by, 0.24);
+      boltGroup.add(bHead);
+
+      // Hex Socket (6-sided cylinder)
+      const socketGeo = new THREE.CylinderGeometry(0.042, 0.042, 0.03, 6);
+      socketGeo.rotateX(Math.PI / 2);
+      const socket = new THREE.Mesh(socketGeo, hexSocketMat);
+      socket.position.set(bx, by, 0.26);
+      boltGroup.add(socket);
+
+      // Fine Index Tick Pin projecting outward
+      const pinGeo = new THREE.BoxGeometry(0.018, 0.20, 0.03);
+      pinGeo.rotateZ(a);
+      const pinMesh = new THREE.Mesh(pinGeo, boltHeadMat);
+      pinMesh.position.set(Math.cos(a) * (dialRadius * 1.24), Math.sin(a) * (dialRadius * 1.24), 0.06);
+      boltGroup.add(pinMesh);
+    }
+    gaugeGroup.add(boltGroup);
+
+    // D. 3D Sweeping Glowing Needle & Machined Billet Hub
+    const needlePivot = new THREE.Group();
+    needlePivot.position.set(0, 0, 0.12);
+    gaugeGroup.add(needlePivot);
+
+    // Central Aluminum Billet Hub Cap
+    const hubMat = new THREE.MeshStandardMaterial({
+      color: 0x363f4e,
+      roughness: 0.25,
+      metalness: 0.95
+    });
+    const hubGeo = new THREE.CylinderGeometry(0.23, 0.26, 0.14, 32);
+    hubGeo.rotateX(Math.PI / 2);
+    const hubMesh = new THREE.Mesh(hubGeo, hubMat);
+    hubMesh.position.z = 0.07;
+    needlePivot.add(hubMesh);
+
+    // Glowing Cyan Core Ring on Hub
+    const hubRingGeo = new THREE.RingGeometry(0.10, 0.14, 32);
+    const hubRingMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff });
+    const hubRing = new THREE.Mesh(hubRingGeo, hubRingMat);
+    hubRing.position.z = 0.145;
+    needlePivot.add(hubRing);
+
+    // 3D Neon Cyan Needle Blade (Aerodynamic tapered blade)
+    const needleShape = new THREE.Shape();
+    needleShape.moveTo(-0.042, -0.25);
+    needleShape.lineTo(0.042, -0.25);
+    needleShape.lineTo(0.035, 1.48);
+    needleShape.lineTo(0.0, 1.66);
+    needleShape.lineTo(-0.035, 1.48);
+    needleShape.closePath();
+
+    const extrudeSettings = { depth: 0.035, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.015, bevelThickness: 0.015 };
+    const needleGeo = new THREE.ExtrudeGeometry(needleShape, extrudeSettings);
+    const needleMat = new THREE.MeshStandardMaterial({
+      color: 0x00d4ff,
+      emissive: 0x00f0ff,
+      emissiveIntensity: 1.5,
+      roughness: 0.15,
+      metalness: 0.3
+    });
+    const needleMesh = new THREE.Mesh(needleGeo, needleMat);
+    needleMesh.position.z = 0.14;
+    needlePivot.add(needleMesh);
+
+    // High-Contrast White Core Spine on Needle
+    const spineGeo = new THREE.BoxGeometry(0.012, 1.55, 0.045);
+    const spineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const spineMesh = new THREE.Mesh(spineGeo, spineMat);
+    spineMesh.position.set(0, 0.72, 0.17);
+    needlePivot.add(spineMesh);
+
+    // Glowing Neon Point Light mounted on the needle
+    const needleGlowLight = new THREE.PointLight(0x00f0ff, 3.2, 3.2);
+    needleGlowLight.position.set(0, 0.9, 0.25);
+    needlePivot.add(needleGlowLight);
+
+    // --------------------------------------------------------------------------
+    // 4. INTERACTION & ANIMATION LOOP
+    // --------------------------------------------------------------------------
+    let mouseX = 0;
+    let mouseY = 0;
+    let targetRotX = 0.52;
+    let targetRotY = -0.14;
+
+    // Needle Angle: In reference photo, needle points towards ~1:30 (-0.72 rad from +Y)
+    let currentNeedleAngle = -0.72;
+    let targetNeedleAngle = -0.72;
+
+    window.addEventListener('mousemove', (e) => {
+      const nx = (e.clientX / window.innerWidth) - 0.5;
+      const ny = (e.clientY / window.innerHeight) - 0.5;
+      mouseX = nx;
+      mouseY = ny;
+
+      // Parallax 3D tilt
+      targetRotX = 0.52 + ny * 0.28;
+      targetRotY = -0.14 + nx * 0.35;
+
+      // Dynamic needle rev on mouse horizontal position
+      const speedFrac = Math.max(0, Math.min(1, (nx + 0.5) * 0.85));
+      targetNeedleAngle = 1.8 - speedFrac * 2.8;
+    });
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    const clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const elapsedTime = clock.getElapsedTime();
+
+      // Smooth Parallax Interpolation
+      gaugeGroup.rotation.x += (targetRotX - gaugeGroup.rotation.x) * 0.05;
+      gaugeGroup.rotation.y += (targetRotY - gaugeGroup.rotation.y) * 0.05;
+
+      // Subtle Idle Engine Vibration Pulse
+      const idlePulse = Math.sin(elapsedTime * 4.5) * 0.02 + Math.sin(elapsedTime * 9.2) * 0.01;
+      currentNeedleAngle += (targetNeedleAngle + idlePulse - currentNeedleAngle) * 0.08;
+
+      // Needle rotation around Z
+      needlePivot.rotation.z = currentNeedleAngle;
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
