@@ -680,17 +680,24 @@ function formWordEffect(element, duration = 1800, delay = 100) {
         if (char === ' ') {
           html += '<span class="brand-divider" style="display:inline-block; width:0.45em;">&nbsp;</span>';
         } else if (i < lockedCount) {
-          // Locked characters resolve seamlessly into their true brand colors as the decipher wave sweeps!
-          const color = isAdi ? '#FFD000' : '#00F0FF';
-          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:${color}; text-shadow:none;">${char}</span>`;
+          // Locked characters: recent lock-ins have a momentary phosphor flash, then settle clean
+          const isFreshLock = (i >= lockedCount - 2);
+          const brandColor = isAdi ? '#FFD000' : '#00F0FF';
+          if (isFreshLock) {
+            const glowColor = isAdi ? 'rgba(255, 208, 0, 0.85)' : 'rgba(0, 240, 255, 0.85)';
+            html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:#FFFFFF; text-shadow:0 0 16px ${glowColor}, 0 0 28px ${glowColor}; font-weight:900; transform:scale(1.06); transition:transform 0.15s, color 0.2s;">${char}</span>`;
+          } else {
+            html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:${brandColor}; text-shadow:none; font-weight:900;">${char}</span>`;
+          }
         } else if (i === lockedCount) {
-          // Active forming head: brilliant flashing white specular scanner pulse
+          // Active Laser Scanner Head: pulsing hyper-bright neon cyan/white leading edge
           const activeGlyph = TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
-          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:#FFFFFF; text-shadow:none; font-weight:900;">${activeGlyph}</span>`;
+          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:#FFFFFF; text-shadow:0 0 16px #00F0FF, 0 0 32px #00F0FF, 0 0 50px #FFFFFF; font-weight:900; transform:scale(1.15);">${activeGlyph}</span>`;
         } else {
-          // Unformed cipher stream: clean matrix stream
+          // Live Cyber Cipher Stream: glowing cyan telemetry glyphs with randomized opacity jitter
           const cipherGlyph = TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
-          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:rgba(255, 255, 255, 0.35); font-weight:400;">${cipherGlyph}</span>`;
+          const alpha = (Math.sin(now * 0.015 + i) * 0.18 + 0.32).toFixed(2);
+          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:rgba(0, 240, 255, ${alpha}); font-weight:400; text-shadow:0 0 8px rgba(0, 240, 255, 0.35);">${cipherGlyph}</span>`;
         }
       }
 
@@ -699,8 +706,16 @@ function formWordEffect(element, duration = 1800, delay = 100) {
       if (progress < 1) {
         requestAnimationFrame(updateForming);
       } else {
-        // Final locked-in state: ADI in pure Speed Yellow, PERFORMANCE resolves to Electric Blue
-        element.innerHTML = '<span class="brand-adi" style="color:#FFD000; text-shadow:none; display:inline-block;">ADI</span><span class="brand-divider" style="display:inline-block; width:0.4em;">&nbsp;</span><span class="brand-perf" style="color:#00F0FF; text-shadow:none; display:inline-block;">PERFORMANCE</span>';
+        // Final locked confirmation bloom that smoothly relaxes into pure clean flat text
+        element.innerHTML = '<span class="brand-adi" style="color:#FFD000; text-shadow:0 0 25px rgba(255,208,0,0.6); display:inline-block; transition:text-shadow 0.4s ease-out;">ADI</span><span class="brand-divider" style="display:inline-block; width:0.4em;">&nbsp;</span><span class="brand-perf" style="color:#00F0FF; text-shadow:0 0 25px rgba(0,240,255,0.6); display:inline-block; transition:text-shadow 0.4s ease-out;">PERFORMANCE</span>';
+        
+        setTimeout(() => {
+          const adiSpan = element.querySelector('.brand-adi');
+          const perfSpan = element.querySelector('.brand-perf');
+          if (adiSpan) adiSpan.style.textShadow = 'none';
+          if (perfSpan) perfSpan.style.textShadow = 'none';
+        }, 320);
+
         element._formingWord = false;
       }
     }
