@@ -81,9 +81,9 @@ function initScrollHUD() {
 }
 
 /* ==========================================================================
-   3. EXACT FRACTURED METALLIC HALO RING (From Reference Site)
-   70 3D faceted metallic titanium shards, depth-sorted, lighting,
-   streak dashes, floating dust particles & smooth mouse parallax.
+   3. PROPOSITION 1: THE MGU-K HYBRID STATOR & DYNO ROTOR BLUEPRINT ENGINE
+   24 precision CAD stator coil poles, central dyno rotor hub with cooling ports,
+   concentric degree calibration rings, active magnetic flux lasers & exploded scroll view.
    ========================================================================== */
 function initMetalRingGlobe() {
   const canvas = document.getElementById('globe');
@@ -104,59 +104,83 @@ function initMetalRingGlobe() {
   window.addEventListener('resize', resize);
 
   // Random generator with deterministic seed
-  let seed = 7;
+  let seed = 42;
   const rr = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
   const rnd = (a, b) => a + rr() * (b - a);
 
-  // Generate 70 3D faceted metallic shards
-  const N = 70;
-  const shards = [];
-  for (let i = 0; i < N; i++) {
-    const th = (i / N) * Math.PI * 2 + rnd(-0.02, 0.02);
-    const aw = ((Math.PI * 2) / N) * rnd(1.3, 2.4);
-    const ri = rnd(0.9, 0.99);
-    const ro = ri + rnd(0.05, 0.2);
+  // 1. Generate 24 Precision MGU-K Electromagnetic Stator Coil Segments
+  const N = 24;
+  const statorSegments = [];
+  const dTheta = (Math.PI * 2) / N;
 
-    // 6-vertex faceted polygon (rough mechanical edges)
+  for (let i = 0; i < N; i++) {
+    const th = i * dTheta;
+    const aw_shoe = dTheta * 0.42;    // Inner pole shoe width
+    const aw_waist = dTheta * 0.26;   // Coil winding neck width
+    const aw_yoke = dTheta * 0.46;    // Outer back-iron yoke width
+
+    const ri = 0.58;                  // Inner air-gap radius
+    const rm = 0.75;                  // Mid-pole radius
+    const ro = 0.98;                  // Outer back-iron radius
+
+    // Precision 6-vertex Stator Pole CAD geometry
     const poly = [
-      [ri + rnd(-0.02, 0.02), -aw / 2],
-      [ri + rnd(-0.03, 0.02), aw / 2],
-      [ro - rnd(0, 0.04), (aw / 2) * rnd(0.5, 1)],
-      [ro + rnd(0, 0.03), aw * rnd(-0.1, 0.2)],
-      [ro - rnd(0, 0.05), (-aw / 2) * rnd(0.5, 1)],
-      [ri + rnd(0.02, 0.08), (-aw / 2) * rnd(0.8, 1.1)]
+      [ri, -aw_shoe],
+      [ri, aw_shoe],
+      [rm, aw_waist],
+      [ro, aw_yoke],
+      [ro, -aw_yoke],
+      [rm, -aw_waist]
     ];
 
-    shards.push({
+    // Copper winding insert geometry (wrapped around the tooth neck)
+    const coilPoly = [
+      [rm - 0.04, -aw_waist * 1.15],
+      [rm - 0.04, aw_waist * 1.15],
+      [rm + 0.12, aw_waist * 1.15],
+      [rm + 0.12, -aw_waist * 1.15]
+    ];
+
+    statorSegments.push({
+      i,
       th,
       poly,
-      tilt: rnd(-0.5, 0.5),
-      tilt2: rnd(-0.4, 0.4),
-      z: rnd(-0.16, 0.16),
-      thick: rnd(0.015, 0.05),
-      sx: rnd(-1, 1),
-      sy: rnd(-1, 1),
-      sz: rnd(-1, 1),
-      sr: rnd(-2, 2),
-      tone: rnd(0, 1),
-      ph: rnd(0, 6.28),
-      big: rr() > 0.82
+      coilPoly,
+      isGoldCoil: (i % 2 === 0), // Speed Yellow copper coil accents
+      thick: 0.042,
+      tilt: 0,
+      tone: (i % 3) / 3,
+      ph: (i / N) * Math.PI * 2
     });
   }
 
-  // Floating ambient metallic dust particles & laser streaks
-  const dust = Array.from({ length: 90 }, () => ({
-    x: rnd(-1.2, 1.2),
-    y: rnd(-1.2, 1.2),
-    z: rnd(-1, 1),
-    v: rnd(0.05, 0.25)
+  // 2. Generate Central Rotor Core with 8 Axial Ventilation Ports
+  const rotorPorts = [];
+  const numPorts = 8;
+  for (let p = 0; p < numPorts; p++) {
+    const ang = (p / numPorts) * Math.PI * 2;
+    rotorPorts.push({
+      ang,
+      r: 0.32,
+      size: 0.045
+    });
+  }
+
+  // 3. High-Speed Magnetic Flux Laser Streaks (Yellow & Electric Cyan)
+  const fluxStreaks = Array.from({ length: 6 }, (_, idx) => ({
+    r: 0.56 + (idx % 3) * 0.28,
+    speed: 0.06 + (idx % 2) * 0.04,
+    len: 0.35 + (idx % 2) * 0.25,
+    p: (idx / 6) * Math.PI * 2,
+    color: idx % 2 === 0 ? 'rgba(255, 208, 0, 0.95)' : 'rgba(0, 220, 255, 0.95)'
   }));
 
-  const streaks = Array.from({ length: 4 }, () => ({
-    a: rnd(0, 6.28),
-    r: rnd(0.15, 0.7),
-    l: rnd(0.25, 0.5),
-    p: rnd(0, 6.28)
+  // 4. Ambient Titanium / Dyno Embers
+  const dust = Array.from({ length: 70 }, () => ({
+    x: rnd(-1.3, 1.3),
+    y: rnd(-1.3, 1.3),
+    z: rnd(-0.8, 0.8),
+    v: rnd(0.04, 0.22)
   }));
 
   let assemble = 1;
@@ -197,21 +221,22 @@ function initMetalRingGlobe() {
     scrollVel *= 0.9;
 
     const now = performance.now() / 1000;
-    rot += 0.0016 + boost;
-    tx += (mx * 0.5 - tx) * 0.04;
-    ty += (my * 0.4 - ty) * 0.04;
+    rot += 0.0018 + boost;
+    tx += (mx * 0.45 - tx) * 0.04;
+    ty += (my * 0.35 - ty) * 0.04;
 
-    const R = Math.min(W, H) * (W < 700 ? 0.38 : 0.375);
+    const R = Math.min(W, H) * (W < 700 ? 0.38 : 0.36);
     const cx = W / 2;
     const cy = H * 0.5 - window.scrollY * 0.12;
     const as = ease(assemble);
+    const k = 1 - as;
 
-    const A = Math.sin(rot * 0.8) * 0.35 + tx;
-    const B = 0.22 + Math.sin(rot * 0.5) * 0.12 + ty;
+    const A = Math.sin(rot * 0.7) * 0.32 + tx;
+    const B = 0.24 + Math.sin(rot * 0.45) * 0.1 + ty;
     const ca = Math.cos(A), sa = Math.sin(A);
     const cb = Math.cos(B), sb = Math.sin(B);
 
-    // 3D Perspective Projection Function
+    // 3D Perspective Projection Matrix
     const proj = (x, y, z) => {
       const x1 = x * ca + z * sa;
       const z1 = -x * sa + z * ca;
@@ -221,68 +246,140 @@ function initMetalRingGlobe() {
       return [cx + x1 * R * s * 2.3, cy + y1 * R * s * 2.3, z2, s];
     };
 
-    // Inner subtle dark vignette disk behind text
-    const rg = ctx.createRadialGradient(cx, cy, R * 0.2, cx, cy, R * 1.1);
-    rg.addColorStop(0, 'rgba(8, 9, 12, 0.82)');
-    rg.addColorStop(0.8, 'rgba(10, 11, 14, 0.55)');
-    rg.addColorStop(1, 'rgba(10, 11, 14, 0)');
+    // Inner subtle dark vignette disk behind text for 100% typography clarity
+    const rg = ctx.createRadialGradient(cx, cy, R * 0.2, cx, cy, R * 1.15);
+    rg.addColorStop(0, 'rgba(8, 10, 15, 0.85)');
+    rg.addColorStop(0.65, 'rgba(8, 10, 15, 0.65)');
+    rg.addColorStop(1, 'rgba(8, 10, 15, 0)');
     ctx.globalAlpha = fade * as;
     ctx.fillStyle = rg;
     ctx.beginPath();
-    ctx.arc(cx, cy, R * 1.1, 0, Math.PI * 2);
+    ctx.arc(cx, cy, R * 1.15, 0, Math.PI * 2);
     ctx.fill();
 
-    // Project and depth-sort shards
-    const list = [];
-    const k = 1 - as;
-    for (const s of shards) {
-      const ang = s.th + rot * 0.12;
-      const ox = s.sx * (k * 2.4 + ex * 2.6);
-      const oy = s.sy * (k * 2.4 + ex * 2.2) + ex * ex * 0.9;
-      const oz = s.sz * (k * 1.6 + ex * 2);
-      const mid = (s.poly[0][0] + s.poly[2][0]) / 2;
-      const t = s.tilt + (k * 2.2 + ex * 3.2) * s.sr + Math.sin(now * 0.5 + s.ph) * 0.05;
-      const u = s.tilt2;
+    // --------------------------------------------------------------------------
+    // A. CAD Telemetry Concentric Blueprint Rings & Degree Markers
+    // --------------------------------------------------------------------------
+    const drawCadRing = (radiusVal, strokeStyle, dashArray = [], lineWidth = 1) => {
+      ctx.save();
+      ctx.strokeStyle = strokeStyle;
+      ctx.lineWidth = lineWidth;
+      ctx.setLineDash(dashArray);
+      ctx.beginPath();
+      const steps = 64;
+      for (let s = 0; s <= steps; s++) {
+        const a = (s / steps) * Math.PI * 2 + rot * 0.05;
+        const px = Math.cos(a) * radiusVal;
+        const py = Math.sin(a) * radiusVal;
+        const P = proj(px, py, 0);
+        if (s === 0) ctx.moveTo(P[0], P[1]);
+        else ctx.lineTo(P[0], P[1]);
+      }
+      ctx.stroke();
+      ctx.restore();
+    };
 
-      const pts = s.poly.map(([r, da]) => {
-        const x = Math.cos(ang + da) * r;
-        const y = Math.sin(ang + da) * r;
-        const dx = x - Math.cos(ang) * mid;
-        const dy = y - Math.sin(ang) * mid;
-        return proj(x + ox, y + oy, s.z + dx * Math.sin(t) * 0.9 + dy * Math.sin(u) * 0.9 + oz);
-      });
+    // Outer Blueprint Rings
+    ctx.globalAlpha = fade * as * 0.45;
+    drawCadRing(1.15, 'rgba(0, 163, 224, 0.55)', [6, 8], 1.2);
+    drawCadRing(1.05, 'rgba(255, 208, 0, 0.6)', [12, 10], 1.0);
+    drawCadRing(0.52, 'rgba(0, 220, 255, 0.45)', [4, 6], 0.8);
 
-      list.push({ pts, z: pts.reduce((a, p) => a + p[2], 0) / pts.length, s });
+    // Radial Degree Ticks (72 calibration ticks every 5 degrees)
+    ctx.lineWidth = 1;
+    for (let deg = 0; deg < 360; deg += 10) {
+      const a = (deg * Math.PI) / 180 + rot * 0.05;
+      const isMajor = (deg % 90 === 0);
+      const isSemiMajor = (deg % 30 === 0);
+      const len = isMajor ? 0.08 : (isSemiMajor ? 0.05 : 0.025);
+      const r1 = 1.05;
+      const r2 = r1 + len;
+
+      const P1 = proj(Math.cos(a) * r1, Math.sin(a) * r1, 0);
+      const P2 = proj(Math.cos(a) * r2, Math.sin(a) * r2, 0);
+
+      ctx.strokeStyle = isMajor ? 'rgba(255, 208, 0, 0.95)' : (isSemiMajor ? 'rgba(0, 220, 255, 0.7)' : 'rgba(200, 214, 235, 0.3)');
+      ctx.beginPath();
+      ctx.moveTo(P1[0], P1[1]);
+      ctx.lineTo(P2[0], P2[1]);
+      ctx.stroke();
+
+      // Major degree text labels in 3D
+      if (isMajor) {
+        const textPos = proj(Math.cos(a) * (r2 + 0.06), Math.sin(a) * (r2 + 0.06), 0);
+        ctx.fillStyle = '#FFD000';
+        ctx.font = '10px "JetBrains Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`${deg}°`, textPos[0], textPos[1]);
+      }
     }
 
-    list.sort((a, b) => a.z - b.z);
-
+    // --------------------------------------------------------------------------
+    // B. Exploded Stator Pole Segments (24 CAD Electromagnetic Units)
+    // --------------------------------------------------------------------------
+    const list = [];
     const lx = Math.cos(now * 0.25);
     const ly = -0.6;
 
-    // Render Faceted Metallic Shards
-    for (const o of list) {
-      const { pts, s } = o;
-      const a = fade * (0.15 + 0.85 * as);
-      const th = s.thick * R * 2;
+    for (const s of statorSegments) {
+      const ang = s.th + rot * 0.12;
 
-      // Extruded thickness (dark underside)
+      // Dynamic Exploded Blueprint Dispersal on Scroll:
+      // Radial explosion outward + Z-axis layer separation!
+      const radialExplode = (ex * 1.6 + k * 1.8);
+      const ox = Math.cos(ang) * radialExplode;
+      const oy = Math.sin(ang) * radialExplode;
+      const oz = (s.isGoldCoil ? 0.12 : -0.12) * ex * 1.4;
+
+      // Project Stator Tooth Polygons
+      const pts = s.poly.map(([r, da]) => {
+        const x = Math.cos(ang + da) * r;
+        const y = Math.sin(ang + da) * r;
+        return proj(x + ox, y + oy, oz);
+      });
+
+      // Project Copper Coil Inserts
+      const coilPts = s.coilPoly.map(([r, da]) => {
+        const x = Math.cos(ang + da) * r;
+        const y = Math.sin(ang + da) * r;
+        return proj(x + ox, y + oy, oz + 0.015);
+      });
+
+      list.push({
+        pts,
+        coilPts,
+        z: pts.reduce((acc, p) => acc + p[2], 0) / pts.length,
+        s,
+        ang
+      });
+    }
+
+    // Depth-sort all 3D mechanical elements
+    list.sort((a, b) => a.z - b.z);
+
+    for (const o of list) {
+      const { pts, coilPts, s } = o;
+      const a = fade * (0.2 + 0.8 * as);
+      const th = s.thick * R * 1.8;
+
+      // 1. Extruded Mechanical Depth (Dark Titanium Underside)
       ctx.globalAlpha = a;
-      ctx.fillStyle = '#14171d';
+      ctx.fillStyle = '#0c0f14';
       ctx.beginPath();
-      pts.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1] + th * p[3] * 2) : ctx.moveTo(p[0], p[1] + th * p[3] * 2)));
+      pts.forEach((p, idx) => (idx ? ctx.lineTo(p[0], p[1] + th * p[3] * 2) : ctx.moveTo(p[0], p[1] + th * p[3] * 2)));
       ctx.closePath();
       ctx.fill();
 
-      // Faceted Shaded Metallic Surfaces
+      // 2. Faceted Stator Tooth Shading (Titanium / Tool Steel Finish)
       for (let i = 1; i < pts.length - 1; i++) {
         const A0 = pts[0], B0 = pts[i], C0 = pts[i + 1];
-        const nx = Math.sin(s.ph + i * 1.9 + now * 0.35);
+        const nx = Math.sin(s.ph + i * 1.8 + now * 0.35);
         const f = 0.5 + 0.5 * (nx * lx + ly * 0.2);
-        const v = Math.max(0, Math.min(1, 0.18 + f * 0.5 * (0.5 + s.tone * 0.7) + ((o.z + 1) / 2) * 0.22));
+        const v = Math.max(0, Math.min(1, 0.2 + f * 0.5 * (0.6 + s.tone * 0.5) + ((o.z + 1) / 2) * 0.2));
 
-        // Titanium metallic specular color tone
-        ctx.fillStyle = `rgb(${28 + v * 88 | 0}, ${33 + v * 92 | 0}, ${42 + v * 98 | 0})`;
+        // Precision Titanium Color
+        ctx.fillStyle = `rgb(${26 + v * 82 | 0}, ${32 + v * 88 | 0}, ${42 + v * 98 | 0})`;
         ctx.beginPath();
         ctx.moveTo(A0[0], A0[1]);
         ctx.lineTo(B0[0], B0[1]);
@@ -291,56 +388,111 @@ function initMetalRingGlobe() {
         ctx.fill();
       }
 
-      // Metallic Specular Edge Gleam
-      ctx.strokeStyle = `rgba(200, 214, 235, ${0.1 + 0.3 * ((o.z + 1) / 2)})`;
-      ctx.lineWidth = 0.8;
+      // 3. Stator Specular Edge Gleams (Electric Cyan outline)
+      ctx.strokeStyle = `rgba(0, 163, 224, ${0.15 + 0.35 * ((o.z + 1) / 2)})`;
+      ctx.lineWidth = 0.9;
       ctx.beginPath();
-      pts.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])));
+      pts.forEach((p, idx) => (idx ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])));
       ctx.closePath();
       ctx.stroke();
 
-      // Highlight on larger shards (Speed Yellow motorsport accents)
-      if (s.big) {
-        ctx.strokeStyle = 'rgba(255, 208, 0, 0.85)';
-        ctx.lineWidth = 1.4;
+      // 4. Speed Yellow Copper Coil Winding Core Insert
+      if (s.isGoldCoil) {
+        ctx.fillStyle = 'rgba(255, 208, 0, 0.85)';
         ctx.beginPath();
-        ctx.moveTo(pts[1][0], pts[1][1]);
-        ctx.lineTo(pts[2][0], pts[2][1]);
+        coilPts.forEach((cp, cidx) => (cidx ? ctx.lineTo(cp[0], cp[1]) : ctx.moveTo(cp[0], cp[1])));
+        ctx.closePath();
+        ctx.fill();
+
+        // High-contrast gold gleam
+        ctx.strokeStyle = '#FFE066';
+        ctx.lineWidth = 1.2;
         ctx.stroke();
       }
     }
 
-    // High-Tech Dashed Laser Streaks (Speed Yellow & Electric Cyan)
-    ctx.lineWidth = 1;
-    for (const s of streaks) {
-      const p = (Math.sin(now * 0.5 + s.p) + 1) / 2;
-      if (p < 0.4) continue;
-      const a1 = s.a + now * 0.04;
-      const x0 = Math.cos(a1) * s.r;
-      const y0 = Math.sin(a1) * s.r;
-      const x1 = x0 + Math.cos(a1 + 1.3) * s.l;
-      const y1 = y0 + Math.sin(a1 + 1.3) * s.l;
-      const P0 = proj(x0, y0, 0);
-      const P1 = proj(x1, y1, 0);
+    // --------------------------------------------------------------------------
+    // C. Central Dyno Rotor Core & Hub (Lifts Forward in Z on Scroll)
+    // --------------------------------------------------------------------------
+    const rotorZ = 0.15 + ex * 0.9;
+    const P_center = proj(0, 0, rotorZ);
 
-      ctx.strokeStyle = (s.p > 3.14) ? 'rgba(255, 208, 0, 0.95)' : 'rgba(0, 220, 255, 0.9)';
-      ctx.globalAlpha = (p - 0.4) * 1.1 * fade * as;
-      ctx.setLineDash([7, 6]);
+    // Rotor Core Base Disk
+    ctx.save();
+    ctx.globalAlpha = fade * as * 0.9;
+    ctx.fillStyle = '#10141b';
+    ctx.strokeStyle = 'rgba(255, 208, 0, 0.8)';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    for (let i = 0; i <= 32; i++) {
+      const a = (i / 32) * Math.PI * 2 + rot * 0.12;
+      const P = proj(Math.cos(a) * 0.42, Math.sin(a) * 0.42, rotorZ);
+      if (i === 0) ctx.moveTo(P[0], P[1]);
+      else ctx.lineTo(P[0], P[1]);
+    }
+    ctx.fill();
+    ctx.stroke();
+
+    // 8 Axial Cooling Ports
+    rotorPorts.forEach((port) => {
+      const pAngle = port.ang + rot * 0.12;
+      const px = Math.cos(pAngle) * port.r;
+      const py = Math.sin(pAngle) * port.r;
+      const P = proj(px, py, rotorZ + 0.01);
+      ctx.fillStyle = 'rgba(0, 163, 224, 0.65)';
       ctx.beginPath();
-      ctx.moveTo(P0[0], P0[1]);
-      ctx.lineTo(P1[0], P1[1]);
+      ctx.arc(P[0], P[1], port.size * R * P[3], 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Central Drive Spline Hub
+    ctx.strokeStyle = '#00F0FF';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    for (let i = 0; i <= 16; i++) {
+      const a = (i / 16) * Math.PI * 2 + rot * 0.12;
+      const rSpline = (i % 2 === 0) ? 0.18 : 0.14;
+      const P = proj(Math.cos(a) * rSpline, Math.sin(a) * rSpline, rotorZ + 0.02);
+      if (i === 0) ctx.moveTo(P[0], P[1]);
+      else ctx.lineTo(P[0], P[1]);
+    }
+    ctx.stroke();
+    ctx.restore();
+
+    // --------------------------------------------------------------------------
+    // D. Active Magnetic Flux Laser Streaks (Yellow & Electric Cyan)
+    // --------------------------------------------------------------------------
+    ctx.lineWidth = 1.2;
+    for (const strk of fluxStreaks) {
+      strk.p = (strk.p + strk.speed * (0.016 + boost * 5)) % (Math.PI * 2);
+      const aStart = strk.p + rot * 0.12;
+      const aEnd = aStart + strk.len;
+
+      ctx.strokeStyle = strk.color;
+      ctx.globalAlpha = 0.9 * fade * as;
+      ctx.setLineDash([8, 6]);
+      ctx.beginPath();
+      const streakSteps = 16;
+      for (let st = 0; st <= streakSteps; st++) {
+        const a = aStart + (st / streakSteps) * strk.len;
+        const P = proj(Math.cos(a) * strk.r, Math.sin(a) * strk.r, 0.02);
+        if (st === 0) ctx.moveTo(P[0], P[1]);
+        else ctx.lineTo(P[0], P[1]);
+      }
       ctx.stroke();
       ctx.setLineDash([]);
     }
 
-    // Floating Ambient Dust Particles
+    // --------------------------------------------------------------------------
+    // E. Floating Titanium & Dyno Dust Embers
+    // --------------------------------------------------------------------------
     ctx.fillStyle = '#dfe7f5';
     for (const d of dust) {
       d.y -= d.v * 0.0016;
-      if (d.y < -1.2) d.y = 1.2;
-      const P = proj(d.x, d.y, d.z * 0.5);
+      if (d.y < -1.3) d.y = 1.3;
+      const P = proj(d.x, d.y, d.z * 0.6);
       ctx.globalAlpha = (0.12 + (P[2] + 1) * 0.25) * fade * as;
-      ctx.fillRect(P[0], P[1], 1.3, 1.3);
+      ctx.fillRect(P[0], P[1], 1.4, 1.4);
     }
 
     ctx.globalAlpha = 1;
@@ -350,7 +502,7 @@ function initMetalRingGlobe() {
   draw();
 }
 
-const GL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>/\\{}[]#$%&*+=_~^';
+const GL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>/\{}[]#$%&*+=_~^';
 
 function scrambleText(element, duration = 850) {
   if (element._scrambling) return;
