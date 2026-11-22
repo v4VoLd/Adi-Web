@@ -697,16 +697,17 @@ function formWordEffect(element, duration = 1800, delay = 100) {
         if (char === ' ') {
           html += '<span class="brand-divider" style="display:inline-block; width:0.45em;">&nbsp;</span>';
         } else if (i < lockedCount) {
-          // Locked characters with live motorsport colors
+          // Locked characters with live motorsport colors during generation
           const colorStyle = isAdi 
             ? 'color:#FFD000; text-shadow: 0 0 16px rgba(255,208,0,0.8), 0 0 30px rgba(255,140,0,0.4);' 
-            : 'color:#FFFFFF; text-shadow: 0 0 18px rgba(0,240,255,0.9), 0 0 38px rgba(0,163,224,0.6);';
+            : 'color:#00F0FF; text-shadow: 0 0 16px rgba(0,240,255,0.8), 0 0 30px rgba(0,163,224,0.4);';
           html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; ${colorStyle}">${char}</span>`;
         } else if (i === lockedCount) {
           // Active forming head: brilliant flashing specular pulse
           const activeGlyph = TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
-          const headColor = isAdi ? '#FFE600' : '#FFFFFF';
-          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:${headColor}; text-shadow: 0 0 20px #00F0FF, 0 0 35px #FFD000; font-weight:900;">${activeGlyph}</span>`;
+          const headColor = isAdi ? '#FFE600' : '#00F0FF';
+          const headGlow = isAdi ? '0 0 20px #FFD000, 0 0 35px #FF8800' : '0 0 20px #00F0FF, 0 0 35px #0090DF';
+          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:${headColor}; text-shadow: ${headGlow}; font-weight:900;">${activeGlyph}</span>`;
         } else {
           // Unformed cipher stream: dim neon matrix glyph in fixed slot
           const cipherGlyph = TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
@@ -720,8 +721,8 @@ function formWordEffect(element, duration = 1800, delay = 100) {
       if (progress < 1) {
         requestAnimationFrame(updateForming);
       } else {
-        // Final locked-in state: ADI in Speed Yellow, PERFORMANCE in White with Electric Blue glow
-        element.innerHTML = '<span class="brand-adi" style="color:#FFD000; text-shadow: 0 0 20px rgba(255,208,0,0.85), 0 0 45px rgba(255,180,0,0.5); display:inline-block;">ADI</span><span class="brand-divider" style="display:inline-block; width:0.4em;">&nbsp;</span><span class="brand-perf" style="color:#FFFFFF; text-shadow: 0 0 20px rgba(0,240,255,0.9), 0 0 45px rgba(0,163,224,0.6); display:inline-block;">PERFORMANCE</span>';
+        // Final locked-in state: ADI in Speed Yellow, PERFORMANCE in pure White without background color
+        element.innerHTML = '<span class="brand-adi" style="color:#FFD000; text-shadow: 0 0 20px rgba(255,208,0,0.85), 0 0 45px rgba(255,180,0,0.5); display:inline-block;">ADI</span><span class="brand-divider" style="display:inline-block; width:0.4em;">&nbsp;</span><span class="brand-perf" style="color:#FFFFFF; text-shadow: none; display:inline-block;">PERFORMANCE</span>';
         element._formingWord = false;
       }
     }
