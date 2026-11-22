@@ -27,7 +27,7 @@
   
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
-  --font-racing: 'Rajdhani', 'Chakra Petch', -apple-system, sans-serif;
+  --font-racing: 'Barlow Semi Condensed', 'DIN Alternate', 'DIN 1451', -apple-system, sans-serif;
   
   --radius-sm: 6px;
   --radius-md: 12px;
@@ -276,8 +276,8 @@ body {
 .logo-text b {
   font-family: var(--font-racing);
   font-size: 1.12rem;
-  font-weight: 800;
-  letter-spacing: 1px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
 }
 
 .logo-text .logo-adi {
@@ -432,8 +432,9 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  background: rgba(255, 208, 0, 0.08);
-  border: 1px solid rgba(255, 208, 0, 0.25);
+  background: rgba(10, 13, 18, 0.88);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 208, 0, 0.35);
   padding: 0.4rem 1rem;
   border-radius: var(--radius-pill);
   font-family: var(--font-mono);
@@ -465,11 +466,12 @@ body {
 
 .hero-title {
   font-family: var(--font-racing);
-  font-size: clamp(3.2rem, 6.4vw, 5.8rem);
-  font-weight: 800;
-  letter-spacing: 2px;
+  font-size: clamp(3.2rem, 6.2vw, 5.5rem);
+  font-weight: 900;
+  letter-spacing: 3px;
   line-height: 1.1;
   text-transform: uppercase;
+  margin-top: 2.2rem;
   margin-bottom: 1.6rem;
   white-space: nowrap !important;
   display: inline-block;
@@ -497,7 +499,7 @@ body {
 .hero-subtitle {
   font-size: clamp(1.1rem, 2.2vw, 1.45rem);
   color: var(--text-secondary);
-  margin-bottom: 2.75rem;
+  margin-bottom: 2.2rem;
   font-weight: 400;
   letter-spacing: -0.2px;
 }
@@ -510,8 +512,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1.25rem;
-  margin-bottom: 4rem;
+  gap: 2.5rem;
+  margin-top: 5.5rem;
+  margin-bottom: 3.5rem;
+  position: relative;
+  z-index: 5;
 }
 
 /* Tactical Corner Crosshair Button (from Yusuf Demirkiran site) */
@@ -2166,6 +2171,47 @@ body {
 
 .record-card:hover {
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(255, 208, 0, 0.2);
+}
+
+/* Floating High-Tech Back to Top Button */
+.back-to-top-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 999;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.15rem;
+  background: rgba(12, 16, 24, 0.85);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 208, 0, 0.4);
+  border-radius: var(--radius-pill);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 208, 0, 0.15);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(16px);
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease, border-color 0.2s, box-shadow 0.2s, color 0.2s;
+}
+
+.back-to-top-btn.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.back-to-top-btn:hover {
+  border-color: #FFD000;
+  color: #FFD000;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.7), 0 0 25px rgba(255, 208, 0, 0.4);
+  transform: translateY(-3px);
 }
 
 

@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   init3DTilt();
   initLaunchpadMatrix();
   initTerminalModal();
+  initBackToTop();
 });
 
 /* ==========================================================================
@@ -287,16 +288,6 @@ function initMetalRingGlobe() {
     ctx.stroke();
     ctx.restore();
 
-    // "RPM" in top center
-    ctx.save();
-    ctx.font = 'bold 44px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.letterSpacing = '6px';
-    ctx.fillText('RPM', cx, cy - R * 0.32);
-    ctx.restore();
-
     // "KM/H"
     ctx.save();
     ctx.font = 'bold 36px "JetBrains Mono", monospace';
@@ -337,7 +328,7 @@ function initMetalRingGlobe() {
   scene.background = null;
 
   const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 100);
-  camera.position.set(0, 0, 7.2);
+  camera.position.set(0, 0, 8.2);
 
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -364,7 +355,7 @@ function initMetalRingGlobe() {
   // --------------------------------------------------------------------------
   // 3. EXPLODABLE 3D GAUGE ASSEMBLY (SEPARATED LAYERS)
   // --------------------------------------------------------------------------
-  const baseGaugeY = -0.22;
+  const baseGaugeY = 0.08;
   const gaugeGroup = new THREE.Group();
   gaugeGroup.rotation.x = 0.44;
   gaugeGroup.rotation.y = -0.10;
@@ -456,11 +447,11 @@ function initMetalRingGlobe() {
   needlePivot.add(hubRing);
 
   const needleShape = new THREE.Shape();
-  needleShape.moveTo(-0.040, -0.25);
-  needleShape.lineTo(0.040, -0.25);
-  needleShape.lineTo(0.034, 1.48);
-  needleShape.lineTo(0.0, 1.66);
-  needleShape.lineTo(-0.034, 1.48);
+  needleShape.moveTo(-0.024, -0.10);
+  needleShape.lineTo(0.024, -0.10);
+  needleShape.lineTo(0.016, 0.40);
+  needleShape.lineTo(0.0, 0.46);
+  needleShape.lineTo(-0.016, 0.40);
   needleShape.closePath();
 
   const extrudeSettings = { depth: 0.035, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.015, bevelThickness: 0.015 };
@@ -476,14 +467,14 @@ function initMetalRingGlobe() {
   needleMesh.position.z = 0.12;
   needlePivot.add(needleMesh);
 
-  const spineGeo = new THREE.BoxGeometry(0.012, 1.55, 0.045);
+  const spineGeo = new THREE.BoxGeometry(0.006, 0.40, 0.045);
   const spineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
   const spineMesh = new THREE.Mesh(spineGeo, spineMat);
-  spineMesh.position.set(0, 0.72, 0.15);
+  spineMesh.position.set(0, 0.20, 0.15);
   needlePivot.add(spineMesh);
 
-  const needleGlowLight = new THREE.PointLight(0x00f0ff, 3.2, 3.0);
-  needleGlowLight.position.set(0, 0.9, 0.22);
+  const needleGlowLight = new THREE.PointLight(0x00f0ff, 2.0, 1.5);
+  needleGlowLight.position.set(0, 0.25, 0.22);
   needlePivot.add(needleGlowLight);
 
   // Blueprint Disassembly Laser Guide Rays
@@ -529,7 +520,7 @@ function initMetalRingGlobe() {
   const startupDuration = 1800; // Synchronized with deliberate text-forming sweep
 
   let currentNeedleAngle = 1.8; // Starts at 0 KM/H
-  let targetNeedleAngle = 1.35; // Settles at idle (~35 KM/H)
+  let targetNeedleAngle = 1.8; // Settles at 0 KM/H bench ready
   let scrollVel = 0;
   let lastY = window.scrollY;
 
@@ -544,7 +535,7 @@ function initMetalRingGlobe() {
 
     if (!startupSweepActive) {
       const speedFrac = Math.max(0, Math.min(1, (nx + 0.5) * 0.85));
-      targetNeedleAngle = 1.6 - speedFrac * 2.6;
+      targetNeedleAngle = 1.8 - speedFrac * 2.65;
     }
   }, { passive: true });
 
@@ -580,13 +571,13 @@ function initMetalRingGlobe() {
         const easeRev = 1 - Math.pow(1 - p1, 3);
         currentNeedleAngle = 1.8 - easeRev * 2.65;
       } else if (t < 1.0) {
-        // Phase 2: Smooth settling return to idle ~35 KM/H (-0.85 -> 1.35)
+        // Phase 2: Smooth settling return to 0 KM/H bench ready
         const p2 = (t - 0.55) / 0.45;
         const easeReturn = 1 - Math.pow(1 - p2, 2);
-        currentNeedleAngle = -0.85 + easeReturn * 2.2;
+        currentNeedleAngle = -0.85 + easeReturn * 2.65;
       } else {
         startupSweepActive = false;
-        targetNeedleAngle = 1.35;
+        targetNeedleAngle = 1.8;
       }
     }
 
@@ -691,16 +682,17 @@ function formWordEffect(element, duration = 1800, delay = 100) {
         if (char === ' ') {
           html += '<span class="brand-divider" style="display:inline-block; width:0.45em;">&nbsp;</span>';
         } else if (i < lockedCount) {
-          // Whole word generates in pure White
-          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:#FFFFFF; text-shadow:none;">${char}</span>`;
+          // Locked characters resolve seamlessly into their true brand colors as the decipher wave sweeps!
+          const color = isAdi ? '#FFD000' : '#00F0FF';
+          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:${color}; text-shadow:none;">${char}</span>`;
         } else if (i === lockedCount) {
-          // Active forming head: brilliant flashing specular pulse
+          // Active forming head: brilliant flashing white specular scanner pulse
           const activeGlyph = TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
           html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:#FFFFFF; text-shadow:none; font-weight:900;">${activeGlyph}</span>`;
         } else {
-          // Unformed cipher stream: clean matrix glyph in fixed slot
+          // Unformed cipher stream: clean matrix stream
           const cipherGlyph = TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
-          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:rgba(255, 255, 255, 0.4); font-weight:400;">${cipherGlyph}</span>`;
+          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:rgba(255, 255, 255, 0.35); font-weight:400;">${cipherGlyph}</span>`;
         }
       }
 
@@ -1301,4 +1293,24 @@ function initScrollReveal() {
       isTicking = true;
     }
   }, { passive: true });
+}
+
+/* ==========================================================================
+   FLOATING BACK TO TOP CONTROLLER
+   ========================================================================== */
+function initBackToTop() {
+  const btn = document.getElementById('back-to-top');
+  if (!btn) return;
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 380) {
+      btn.classList.add('visible');
+    } else {
+      btn.classList.remove('visible');
+    }
+  }, { passive: true });
+
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 }
