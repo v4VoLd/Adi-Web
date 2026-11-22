@@ -441,12 +441,13 @@ function initMetalRingGlobe() {
   hubRing.position.z = 0.125;
   needlePivot.add(hubRing);
 
+  // 3D Neon Cyan Needle Blade (Full size sweeping tachometer pointer)
   const needleShape = new THREE.Shape();
-  needleShape.moveTo(-0.024, -0.10);
-  needleShape.lineTo(0.024, -0.10);
-  needleShape.lineTo(0.016, 0.40);
-  needleShape.lineTo(0.0, 0.46);
-  needleShape.lineTo(-0.016, 0.40);
+  needleShape.moveTo(-0.040, -0.25);
+  needleShape.lineTo(0.040, -0.25);
+  needleShape.lineTo(0.034, 1.50);
+  needleShape.lineTo(0.0, 1.68);
+  needleShape.lineTo(-0.034, 1.50);
   needleShape.closePath();
 
   const extrudeSettings = { depth: 0.035, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.015, bevelThickness: 0.015 };
@@ -462,14 +463,16 @@ function initMetalRingGlobe() {
   needleMesh.position.z = 0.12;
   needlePivot.add(needleMesh);
 
-  const spineGeo = new THREE.BoxGeometry(0.006, 0.40, 0.045);
+  // White-Hot High-Contrast Core Spine on Needle
+  const spineGeo = new THREE.BoxGeometry(0.012, 1.55, 0.045);
   const spineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
   const spineMesh = new THREE.Mesh(spineGeo, spineMat);
-  spineMesh.position.set(0, 0.20, 0.15);
+  spineMesh.position.set(0, 0.72, 0.15);
   needlePivot.add(spineMesh);
 
-  const needleGlowLight = new THREE.PointLight(0x00f0ff, 2.0, 1.5);
-  needleGlowLight.position.set(0, 0.25, 0.22);
+  // Dynamic Neon Point Light mounted on the needle
+  const needleGlowLight = new THREE.PointLight(0x00f0ff, 3.2, 3.0);
+  needleGlowLight.position.set(0, 0.9, 0.22);
   needlePivot.add(needleGlowLight);
 
   // Blueprint Disassembly Laser Guide Rays
