@@ -349,14 +349,15 @@ function initMetalRingGlobe() {
   // --------------------------------------------------------------------------
   // 3. EXPLODABLE 3D GAUGE ASSEMBLY (SEPARATED LAYERS)
   // --------------------------------------------------------------------------
-  const baseGaugeY = -0.06;
+  const baseGaugeY = -0.03;
   const gaugeGroup = new THREE.Group();
   gaugeGroup.rotation.x = 0.44;
   gaugeGroup.rotation.y = -0.10;
   gaugeGroup.position.set(0, baseGaugeY, 0);
   scene.add(gaugeGroup);
 
-  const dialRadius = 1.95;
+  // Full commanding heroic dial scale - fills the cockpit height symmetrically
+  const dialRadius = 2.30;
 
   // LAYER 1: Base Plate Mesh
   const baseTex = createBaseTexture();
