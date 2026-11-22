@@ -442,6 +442,82 @@ function initMetalRingGlobe() {
   needlePivot.add(needleGlowLight);
 
   // --------------------------------------------------------------------------
+  // C. DYNAMIC HIGH-OCTANE SCROLL PARTICLES (Dyno Embers & Aerodynamic Sparks)
+  // --------------------------------------------------------------------------
+  function createParticleTexture() {
+    const cv = document.createElement('canvas');
+    cv.width = 64;
+    cv.height = 64;
+    const ctx = cv.getContext('2d');
+    const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+    grad.addColorStop(0.2, 'rgba(255, 220, 100, 0.85)');
+    grad.addColorStop(0.5, 'rgba(0, 210, 255, 0.35)');
+    grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(32, 32, 32, 0, Math.PI * 2);
+    ctx.fill();
+    return new THREE.CanvasTexture(cv);
+  }
+
+  const particleCount = 220;
+  const particleGeo = new THREE.BufferGeometry();
+  const particlePositions = new Float32Array(particleCount * 3);
+  const particleColors = new Float32Array(particleCount * 3);
+  const particleSizes = new Float32Array(particleCount);
+  const particlesData = [];
+
+  const colorPalette = [
+    new THREE.Color(0xFFD000), // Speed Yellow
+    new THREE.Color(0xFFA500), // Amber Gold
+    new THREE.Color(0x00E5FF), // Electric Cyan
+    new THREE.Color(0x00A3E0), // Azure Cyan
+    new THREE.Color(0xFFFFFF)  // White Specular Spark
+  ];
+
+  for (let i = 0; i < particleCount; i++) {
+    const x = (Math.random() - 0.5) * 7.5;
+    const y = (Math.random() - 0.5) * 6.5;
+    const z = (Math.random() - 0.5) * 4.5 + 0.5;
+
+    particlePositions[i * 3] = x;
+    particlePositions[i * 3 + 1] = y;
+    particlePositions[i * 3 + 2] = z;
+
+    const col = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+    particleColors[i * 3] = col.r;
+    particleColors[i * 3 + 1] = col.g;
+    particleColors[i * 3 + 2] = col.b;
+
+    particleSizes[i] = Math.random() * 0.12 + 0.05;
+
+    particlesData.push({
+      vy: Math.random() * 0.008 + 0.003, // Base upward drift
+      vx: (Math.random() - 0.5) * 0.004,
+      vz: (Math.random() - 0.5) * 0.003,
+      phase: Math.random() * Math.PI * 2,
+      baseSize: particleSizes[i]
+    });
+  }
+
+  particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+  particleGeo.setAttribute('color', new THREE.BufferAttribute(particleColors, 3));
+
+  const particleMat = new THREE.PointsMaterial({
+    size: 0.14,
+    map: createParticleTexture(),
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.85,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  });
+
+  const particlePoints = new THREE.Points(particleGeo, particleMat);
+  scene.add(particlePoints);
+
+  // --------------------------------------------------------------------------
   // 4. INTERACTION, PARALLAX & SCROLL PHYSICS
   // --------------------------------------------------------------------------
   let mouseX = 0;
@@ -510,7 +586,40 @@ function initMetalRingGlobe() {
 
     // Scroll Rev Acceleration
     const scrollSurge = Math.min(1.8, Math.abs(scrollVel) * 0.08 + scrollProgress * 1.5);
+    const absScrollVel = Math.abs(scrollVel);
     scrollVel *= 0.92;
+
+    // ------------------------------------------------------------------------
+    // Dynamic Scroll Particles Engine
+    // Accelerates upwards and expands in depth when user scrolls
+    // ------------------------------------------------------------------------
+    const scrollBoost = Math.min(25, absScrollVel * 0.18 + scrollProgress * 1.2);
+    const posArr = particleGeo.attributes.position.array;
+
+    for (let i = 0; i < particleCount; i++) {
+      const i3 = i * 3;
+      const p = particlesData[i];
+
+      // Vertical drift with scroll acceleration
+      posArr[i3 + 1] += p.vy + scrollBoost * 0.004;
+
+      // Subtle lateral Brownian oscillation
+      posArr[i3] += Math.sin(elapsedTime * 2.2 + p.phase) * 0.002 + p.vx;
+      posArr[i3 + 2] += Math.cos(elapsedTime * 1.8 + p.phase) * 0.002 + p.vz;
+
+      // Wrap boundaries seamlessly
+      if (posArr[i3 + 1] > 3.6) {
+        posArr[i3 + 1] = -3.6;
+        posArr[i3] = (Math.random() - 0.5) * 7.0;
+        posArr[i3 + 2] = (Math.random() - 0.5) * 4.5 + 0.5;
+      }
+    }
+    particleGeo.attributes.position.needsUpdate = true;
+
+    // Parallax tilt on particles
+    particlePoints.rotation.x = gaugeGroup.rotation.x * 0.4;
+    particlePoints.rotation.y = gaugeGroup.rotation.y * 0.4;
+    particleMat.opacity = Math.max(0.2, (0.75 + Math.min(0.25, absScrollVel * 0.02)) * fade);
 
     // Subtle Idle Engine Vibration Pulse
     const idlePulse = Math.sin(elapsedTime * 4.5) * 0.02 + Math.sin(elapsedTime * 9.2) * 0.01;
