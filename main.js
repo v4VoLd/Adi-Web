@@ -693,19 +693,25 @@ function formWordEffect(element, duration = 1800, delay = 100) {
       let html = '';
       for (let i = 0; i < len; i++) {
         const char = targetText[i];
+        const isAdi = i < 3; // 'ADI'
         if (char === ' ') {
-          html += '<span style="display:inline-block; width:0.45em;">&nbsp;</span>';
+          html += '<span class="brand-divider" style="display:inline-block; width:0.45em;">&nbsp;</span>';
         } else if (i < lockedCount) {
-          // Locked character: crisp white with fixed cell width to prevent any layout shifts
-          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:#ffffff; text-shadow: 0 0 10px rgba(255,255,255,0.2);">${char}</span>`;
+          // Locked characters with live motorsport colors
+          const colorStyle = isAdi 
+            ? 'color:#FFD000; text-shadow: 0 0 16px rgba(255,208,0,0.8), 0 0 30px rgba(255,140,0,0.4);' 
+            : 'color:#00F0FF; text-shadow: 0 0 16px rgba(0,240,255,0.75), 0 0 30px rgba(0,163,224,0.4);';
+          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; ${colorStyle}">${char}</span>`;
         } else if (i === lockedCount) {
-          // Active forming head: flashing Electric Cyan with neon glow in fixed slot
+          // Active forming head: brilliant flashing specular pulse
           const activeGlyph = TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
-          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:#00F0FF; text-shadow: 0 0 16px #00F0FF, 0 0 30px #00F0FF; font-weight:900;">${activeGlyph}</span>`;
+          const headColor = isAdi ? '#FFE600' : '#FFFFFF';
+          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:${headColor}; text-shadow: 0 0 20px #00F0FF, 0 0 35px #FFD000; font-weight:900;">${activeGlyph}</span>`;
         } else {
-          // Unformed cipher stream: dim matrix glyph in fixed slot
+          // Unformed cipher stream: dim neon matrix glyph in fixed slot
           const cipherGlyph = TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
-          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:rgba(120, 160, 210, 0.28); font-weight:400;">${cipherGlyph}</span>`;
+          const cipherColor = isAdi ? 'rgba(255, 208, 0, 0.28)' : 'rgba(0, 220, 255, 0.25)';
+          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:${cipherColor}; font-weight:400;">${cipherGlyph}</span>`;
         }
       }
 
@@ -714,8 +720,8 @@ function formWordEffect(element, duration = 1800, delay = 100) {
       if (progress < 1) {
         requestAnimationFrame(updateForming);
       } else {
-        // Final lock-in: pure clean headline
-        element.textContent = targetText;
+        // Final locked-in state: High-Voltage dual-tone motorsport gradient
+        element.innerHTML = '<span class="brand-adi" style="background: linear-gradient(135deg, #FFF066 0%, #FFD000 45%, #FF8800 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 25px rgba(255, 208, 0, 0.7)); display: inline-block;">ADI</span><span class="brand-divider" style="display:inline-block; width:0.4em;">&nbsp;</span><span class="brand-perf" style="background: linear-gradient(135deg, #FFFFFF 0%, #B8F0FF 40%, #00F0FF 75%, #0090DF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 28px rgba(0, 240, 255, 0.65)); display: inline-block;">PERFORMANCE</span>';
         element._formingWord = false;
       }
     }
