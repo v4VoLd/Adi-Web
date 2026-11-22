@@ -689,21 +689,16 @@ function formWordEffect(element, duration = 1800, delay = 100) {
         if (char === ' ') {
           html += '<span class="brand-divider" style="display:inline-block; width:0.45em;">&nbsp;</span>';
         } else if (i < lockedCount) {
-          // Locked characters: ADI in Speed Yellow, PERFORMANCE generates in pure White
-          const colorStyle = isAdi 
-            ? 'color:#FFD000; text-shadow:none;' 
-            : 'color:#FFFFFF; text-shadow:none;';
-          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; ${colorStyle}">${char}</span>`;
+          // Whole word generates in pure White
+          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:#FFFFFF; text-shadow:none;">${char}</span>`;
         } else if (i === lockedCount) {
-          // Active forming head: brilliant flashing pulse
+          // Active forming head: brilliant flashing specular pulse
           const activeGlyph = TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
-          const headColor = isAdi ? '#FFE600' : '#FFFFFF';
-          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:${headColor}; text-shadow:none; font-weight:900;">${activeGlyph}</span>`;
+          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:#FFFFFF; text-shadow:none; font-weight:900;">${activeGlyph}</span>`;
         } else {
           // Unformed cipher stream: clean matrix glyph in fixed slot
           const cipherGlyph = TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
-          const cipherColor = isAdi ? 'rgba(255, 208, 0, 0.4)' : 'rgba(255, 255, 255, 0.45)';
-          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:${cipherColor}; font-weight:400;">${cipherGlyph}</span>`;
+          html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:rgba(255, 255, 255, 0.4); font-weight:400;">${cipherGlyph}</span>`;
         }
       }
 
