@@ -349,7 +349,7 @@ function initMetalRingGlobe() {
   // --------------------------------------------------------------------------
   // 3. EXPLODABLE 3D GAUGE ASSEMBLY (SEPARATED LAYERS)
   // --------------------------------------------------------------------------
-  const baseGaugeY = -0.03;
+  const baseGaugeY = -0.09;
   const gaugeGroup = new THREE.Group();
   gaugeGroup.rotation.x = 0.44;
   gaugeGroup.rotation.y = -0.10;
@@ -509,17 +509,17 @@ function initMetalRingGlobe() {
   let targetRotY = -0.10;
 
   // Ignition Needle Sweep State
-  // Angle calibration: -2.76 = 0 KM/H (points down-right), +0.40 = Redline (points top)
-  const NEEDLE_ZERO = -2.76;
-  const NEEDLE_MAX = 0.40;
-  const NEEDLE_SWEEP = NEEDLE_MAX - NEEDLE_ZERO; // 3.16 rad
+  // Angle calibration: 1.70 = 0 KM/H idle (bottom-left), -1.00 = 340+ KM/H redline (top-right yellow arc)
+  const NEEDLE_IDLE = 1.70;
+  const NEEDLE_REDLINE = -1.00;
+  const NEEDLE_SPAN = NEEDLE_IDLE - NEEDLE_REDLINE; // 2.70 rad full sweep
 
   let startupSweepActive = true;
   let startupStartTime = performance.now();
   const startupDuration = 1800; // Synchronized with deliberate text-forming sweep
 
-  let currentNeedleAngle = NEEDLE_ZERO; // Starts at 0 KM/H
-  let targetNeedleAngle = NEEDLE_ZERO; // Settles at 0 KM/H bench ready
+  let currentNeedleAngle = NEEDLE_IDLE; // Starts at 0 KM/H
+  let targetNeedleAngle = NEEDLE_IDLE; // Settles at 0 KM/H bench ready
   let scrollVel = 0;
   let lastY = window.scrollY;
 
@@ -532,10 +532,10 @@ function initMetalRingGlobe() {
     targetRotX = 0.44 + ny * 0.25;
     targetRotY = -0.10 + nx * 0.32;
 
-    if (!startupSweepActive) {
-      const speedFrac = Math.max(0, Math.min(1, (nx + 0.5) * 0.85));
-      targetNeedleAngle = NEEDLE_ZERO + speedFrac * NEEDLE_SWEEP;
-    }
+    // Full interactive engine rev: moving mouse left-to-right revs the needle across the entire dial!
+    startupSweepActive = false; // Mouse motion takes immediate throttle control
+    const speedFrac = Math.max(0, Math.min(1, e.clientX / window.innerWidth));
+    targetNeedleAngle = NEEDLE_IDLE - speedFrac * NEEDLE_SPAN;
   }, { passive: true });
 
   window.addEventListener('scroll', () => {
@@ -568,15 +568,15 @@ function initMetalRingGlobe() {
         // Phase 1: Rapid rev from 0 to redline
         const p1 = t / 0.55;
         const easeRev = 1 - Math.pow(1 - p1, 3);
-        currentNeedleAngle = NEEDLE_ZERO + easeRev * NEEDLE_SWEEP;
+        currentNeedleAngle = NEEDLE_IDLE - easeRev * NEEDLE_SPAN;
       } else if (t < 1.0) {
         // Phase 2: Smooth settling return to 0 KM/H bench ready
         const p2 = (t - 0.55) / 0.45;
         const easeReturn = 1 - Math.pow(1 - p2, 2);
-        currentNeedleAngle = NEEDLE_MAX - easeReturn * NEEDLE_SWEEP;
+        currentNeedleAngle = NEEDLE_REDLINE + easeReturn * NEEDLE_SPAN;
       } else {
         startupSweepActive = false;
-        targetNeedleAngle = NEEDLE_ZERO;
+        targetNeedleAngle = NEEDLE_IDLE;
       }
     }
 
