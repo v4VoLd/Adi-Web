@@ -441,7 +441,7 @@ function initMetalRingGlobe() {
   hubRing.position.z = 0.125;
   needlePivot.add(hubRing);
 
-  // 3D Neon Cyan Needle Blade (Full size sweeping tachometer pointer)
+  // Authentic Motorsport High-Contrast Racing Needle (Porsche GT3 / BMW M style)
   const needleShape = new THREE.Shape();
   needleShape.moveTo(-0.040, -0.25);
   needleShape.lineTo(0.040, -0.25);
@@ -453,25 +453,25 @@ function initMetalRingGlobe() {
   const extrudeSettings = { depth: 0.035, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.015, bevelThickness: 0.015 };
   const needleGeo = new THREE.ExtrudeGeometry(needleShape, extrudeSettings);
   const needleMat = new THREE.MeshStandardMaterial({
-    color: 0x00d4ff,
-    emissive: 0x00f0ff,
-    emissiveIntensity: 1.6,
-    roughness: 0.15,
-    metalness: 0.3
+    color: 0xff3b1d, // High-contrast fluorescent racing red-orange for instant visibility
+    emissive: 0xff2405, // Clean instrument backlight glow, not blindingly flashy
+    emissiveIntensity: 1.15,
+    roughness: 0.22,
+    metalness: 0.25
   });
   const needleMesh = new THREE.Mesh(needleGeo, needleMat);
   needleMesh.position.z = 0.12;
   needlePivot.add(needleMesh);
 
-  // White-Hot High-Contrast Core Spine on Needle
-  const spineGeo = new THREE.BoxGeometry(0.012, 1.55, 0.045);
+  // White-Hot High-Contrast Core Optical Spine on Needle
+  const spineGeo = new THREE.BoxGeometry(0.016, 1.58, 0.048);
   const spineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
   const spineMesh = new THREE.Mesh(spineGeo, spineMat);
   spineMesh.position.set(0, 0.72, 0.15);
   needlePivot.add(spineMesh);
 
-  // Dynamic Neon Point Light mounted on the needle
-  const needleGlowLight = new THREE.PointLight(0x00f0ff, 3.2, 3.0);
+  // Tasteful Instrument Backlight Glow mounted on the needle
+  const needleGlowLight = new THREE.PointLight(0xff3814, 2.4, 2.8);
   needleGlowLight.position.set(0, 0.9, 0.22);
   needlePivot.add(needleGlowLight);
 
