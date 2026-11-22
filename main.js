@@ -700,7 +700,7 @@ function formWordEffect(element, duration = 1800, delay = 100) {
           // Locked characters with live motorsport colors
           const colorStyle = isAdi 
             ? 'color:#FFD000; text-shadow: 0 0 16px rgba(255,208,0,0.8), 0 0 30px rgba(255,140,0,0.4);' 
-            : 'color:#00F0FF; text-shadow: 0 0 16px rgba(0,240,255,0.75), 0 0 30px rgba(0,163,224,0.4);';
+            : 'color:#FFFFFF; text-shadow: 0 0 18px rgba(0,240,255,0.9), 0 0 38px rgba(0,163,224,0.6);';
           html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; ${colorStyle}">${char}</span>`;
         } else if (i === lockedCount) {
           // Active forming head: brilliant flashing specular pulse
@@ -710,7 +710,7 @@ function formWordEffect(element, duration = 1800, delay = 100) {
         } else {
           // Unformed cipher stream: dim neon matrix glyph in fixed slot
           const cipherGlyph = TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
-          const cipherColor = isAdi ? 'rgba(255, 208, 0, 0.28)' : 'rgba(0, 220, 255, 0.25)';
+          const cipherColor = isAdi ? 'rgba(255, 208, 0, 0.28)' : 'rgba(0, 220, 255, 0.35)';
           html += `<span style="display:inline-block; text-align:center; min-width:0.65ch; color:${cipherColor}; font-weight:400;">${cipherGlyph}</span>`;
         }
       }
@@ -720,8 +720,8 @@ function formWordEffect(element, duration = 1800, delay = 100) {
       if (progress < 1) {
         requestAnimationFrame(updateForming);
       } else {
-        // Final locked-in state: Pure two-tone neon brand colors matching the forming sequence exactly
-        element.innerHTML = '<span class="brand-adi" style="color:#FFD000; text-shadow: 0 0 20px rgba(255,208,0,0.85), 0 0 45px rgba(255,180,0,0.5); display:inline-block;">ADI</span><span class="brand-divider" style="display:inline-block; width:0.4em;">&nbsp;</span><span class="brand-perf" style="color:#00F0FF; text-shadow: 0 0 20px rgba(0,240,255,0.85), 0 0 45px rgba(0,163,224,0.5); display:inline-block;">PERFORMANCE</span>';
+        // Final locked-in state: ADI in Speed Yellow, PERFORMANCE in White with Electric Blue glow
+        element.innerHTML = '<span class="brand-adi" style="color:#FFD000; text-shadow: 0 0 20px rgba(255,208,0,0.85), 0 0 45px rgba(255,180,0,0.5); display:inline-block;">ADI</span><span class="brand-divider" style="display:inline-block; width:0.4em;">&nbsp;</span><span class="brand-perf" style="color:#FFFFFF; text-shadow: 0 0 20px rgba(0,240,255,0.9), 0 0 45px rgba(0,163,224,0.6); display:inline-block;">PERFORMANCE</span>';
         element._formingWord = false;
       }
     }
