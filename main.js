@@ -658,10 +658,73 @@ function initMetalRingGlobe() {
   animate();
 }
 
-const GL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>/\\{}[]#$%&*+=_~^';
+// --------------------------------------------------------------------------
+// HIGH-TECH WORD FORMING & CIPHER DECRYPTION ENGINE
+// Actively forms "ADI PERFORMANCE" letter-by-letter on page entry
+// --------------------------------------------------------------------------
+const TELEMETRY_GLYPHS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ<>/{}[];*+=_~^$#@';
+
+function formWordEffect(element, duration = 1800, delay = 100) {
+  if (element._formingWord) return;
+  element._formingWord = true;
+
+  const targetText = element.getAttribute('data-value') || element.textContent.trim() || 'ADI PERFORMANCE';
+  const len = targetText.length;
+  
+  // Set initial encrypted telemetry state immediately (so the full word does not show at first)
+  let initialCipher = '';
+  for (let i = 0; i < len; i++) {
+    initialCipher += targetText[i] === ' ' ? ' ' : TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
+  }
+  element.textContent = initialCipher;
+
+  setTimeout(() => {
+    const startTime = performance.now();
+
+    function updateForming(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(1, elapsed / duration);
+
+      // Non-linear pacing: start fast on 'ADI', then deliberate mechanical lock-in on 'PERFORMANCE'
+      const ease = 1 - Math.pow(1 - progress, 2.5);
+      const lockedCount = Math.floor(len * ease);
+
+      let html = '';
+      for (let i = 0; i < len; i++) {
+        const char = targetText[i];
+        if (char === ' ') {
+          html += '<span style="display:inline-block; width:0.4em;">&nbsp;</span>';
+        } else if (i < lockedCount) {
+          // Locked character: crisp white
+          html += `<span style="color:#ffffff; text-shadow: 0 0 10px rgba(255,255,255,0.2);">${char}</span>`;
+        } else if (i === lockedCount) {
+          // Active forming head: flashing Electric Cyan with neon glow
+          const activeGlyph = TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
+          html += `<span style="color:#00F0FF; text-shadow: 0 0 16px #00F0FF, 0 0 30px #00F0FF; font-weight:900;">${activeGlyph}</span>`;
+        } else {
+          // Unformed cipher stream: dim blue-gray matrix characters
+          const cipherGlyph = TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
+          html += `<span style="color:rgba(120, 160, 210, 0.28); font-weight:400;">${cipherGlyph}</span>`;
+        }
+      }
+
+      element.innerHTML = html;
+
+      if (progress < 1) {
+        requestAnimationFrame(updateForming);
+      } else {
+        // Final lock-in: pure clean headline
+        element.textContent = targetText;
+        element._formingWord = false;
+      }
+    }
+
+    requestAnimationFrame(updateForming);
+  }, delay);
+}
 
 function scrambleText(element, duration = 850) {
-  if (element._scrambling) return;
+  if (element._scrambling || element._formingWord) return;
   element._scrambling = true;
 
   const originalText = element.getAttribute('data-value') || element.textContent.trim();
@@ -679,7 +742,7 @@ function scrambleText(element, duration = 850) {
       } else if (i < revealedLength) {
         output += originalText[i];
       } else {
-        output += GL[Math.floor(Math.random() * GL.length)];
+        output += TELEMETRY_GLYPHS[Math.floor(Math.random() * TELEMETRY_GLYPHS.length)];
       }
     }
 
@@ -697,19 +760,25 @@ function scrambleText(element, duration = 850) {
 }
 
 function initScrambleEffects() {
-  // Scramble main hero title on page entry
+  // Hero title word-forming on page load
   const heroTitle = document.querySelector('.scramble-target');
   if (heroTitle) {
-    setTimeout(() => scrambleText(heroTitle, 1200), 300);
+    // Initiate word forming animation
+    formWordEffect(heroTitle, 1900, 100);
+
+    // Hover effect: re-form the word on mouse hover
+    heroTitle.style.cursor = 'pointer';
+    heroTitle.addEventListener('mouseenter', () => {
+      formWordEffect(heroTitle, 1400, 0);
+    });
   }
 
-  // Scramble on hover for navigation links & badges
+  // Hover scramble on navigation links & badges
   const hoverLinks = document.querySelectorAll('.scramble-hover');
   hoverLinks.forEach((link) => {
     link.addEventListener('mouseenter', () => scrambleText(link, 500));
   });
 }
-
 /* ==========================================================================
    5. NUMBER COUNTERS IN HERO
    ========================================================================== */
